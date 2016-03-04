@@ -30,10 +30,13 @@ else
 		http://git.savannah.gnu.org/r/grub.git"
 fi
 
-PATCHES=( "${FILESDIR}"/grub-2.02_beta2-KERNEL_GLOBS.patch )
+PATCHES=(
+	"${FILESDIR}"/gfxpayload.patch
+	"${FILESDIR}"/grub-2.02_beta2-KERNEL_GLOBS.patch
+)
 
-DEJAVU=dejavu-sans-ttf-2.34
-UNIFONT=unifont-7.0.06
+DEJAVU=dejavu-sans-ttf-2.35
+UNIFONT=unifont-8.0.01
 SRC_URI+=" fonts? ( mirror://gnu/unifont/${UNIFONT}/${UNIFONT}.pcf.gz )
 	themes? ( mirror://sourceforge/dejavu/${DEJAVU}.zip )"
 

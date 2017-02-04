@@ -1,11 +1,16 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
 EAPI=6
 
 if [[ ${PV} == 9999  ]]; then
+	GRUB_AUTOGEN=1
+fi
+
+if [[ -n ${GRUB_AUTOGEN} ]]; then
 	PYTHON_COMPAT=( python{2_7,3_3,3_4,3_5} )
+	WANT_LIBTOOL=none
 	inherit autotools python-any-r1
 fi
 
@@ -18,9 +23,7 @@ if [[ ${PV} != 9999 ]]; then
 		SRC_URI="mirror://gnu-alpha/${PN}/${MY_P}.tar.xz"
 		S=${WORKDIR}/${MY_P}
 	else
-		SRC_URI="mirror://gnu/${PN}/${P}.tar.xz
-			mirror://gentoo/${P}.tar.xz
-			https://dev.gentoo.org/~floppym/dist/${P}.tar.xz"
+		SRC_URI="mirror://gnu/${PN}/${P}.tar.xz"
 		S=${WORKDIR}/${P%_*}
 	fi
 	KEYWORDS="~amd64 ~x86"
@@ -36,7 +39,7 @@ PATCHES=(
 )
 
 DEJAVU=dejavu-sans-ttf-2.37
-UNIFONT=unifont-9.0.02
+UNIFONT=unifont-9.0.06
 SRC_URI+=" fonts? ( mirror://gnu/unifont/${UNIFONT}/${UNIFONT}.pcf.gz )
 	themes? ( mirror://sourceforge/dejavu/${DEJAVU}.zip )"
 
@@ -134,7 +137,7 @@ src_prepare() {
 		sed -i -e 's/^\* GRUB:/* GRUB2:/' -e 's/(grub)/(grub2)/' docs/grub.texi || die
 	fi
 
-	if [[ ${PV} == 9999 ]]; then
+	if [[ -n ${GRUB_AUTOGEN} ]]; then
 		python_setup
 		bash autogen.sh || die
 		autopoint() { :; }
@@ -202,7 +205,8 @@ grub_configure() {
 		ln -s "${WORKDIR}/${DEJAVU}/ttf/DejaVuSans.ttf" DejaVuSans.ttf || die
 	fi
 
-	ECONF_SOURCE="${S}" econf "${myeconfargs[@]}"
+	local ECONF_SOURCE="${S}"
+	econf "${myeconfargs[@]}"
 }
 
 src_configure() {
@@ -225,8 +229,12 @@ src_configure() {
 	tc-export CC NM OBJCOPY RANLIB STRIP
 	tc-export BUILD_CC # Bug 485592
 
-	# Portage will take care of cleaning up GRUB_PLATFORMS
-	MULTIBUILD_VARIANTS=( ${GRUB_PLATFORMS:-guessed} )
+	MULTIBUILD_VARIANTS=()
+	local p
+	for p in "${GRUB_ALL_PLATFORMS[@]}"; do
+		use "grub_platforms_${p}" && MULTIBUILD_VARIANTS+=( "${p}" )
+	done
+	[[ ${#MULTIBUILD_VARIANTS[@]} -eq 0 ]] && MULTIBUILD_VARIANTS=( guessed )
 	grub_do grub_configure
 }
 

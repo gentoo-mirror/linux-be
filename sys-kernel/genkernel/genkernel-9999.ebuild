@@ -6,14 +6,14 @@
 
 EAPI=5 # approved 2012.09.11, required by all profiles since 2014.03.12
 
-VERSION_BUSYBOX='1.26.0'
-VERSION_DMRAID='1.0.0.rc16-3'
-VERSION_MDADM='3.1.5'
-VERSION_FUSE='2.8.6'
-VERSION_ISCSI='2.0-872'
-VERSION_LVM='2.02.88'
+VERSION_BUSYBOX='1.27.2' # warning, be sure to bump patches
+VERSION_DMRAID='1.0.0.rc16-3' # warning, be sure to bump patches
+VERSION_MDADM='3.4' # warning, be sure to bump patches
+VERSION_FUSE='2.8.6' # warning, be sure to bump patches
+VERSION_ISCSI='2.0-872' # warning, be sure to bump patches
+VERSION_LVM='2.02.173' # warning, be sure to bump patches
 VERSION_UNIONFS_FUSE='0.24'
-VERSION_GPG='1.4.11'
+VERSION_GPG='1.4.22'
 
 RH_HOME="ftp://sourceware.org/pub"
 DM_HOME="https://people.redhat.com/~heinzm/sw/dmraid/src"
@@ -21,7 +21,7 @@ BB_HOME="https://busybox.net/downloads"
 
 COMMON_URI="${DM_HOME}/dmraid-${VERSION_DMRAID}.tar.bz2
 		${DM_HOME}/old/dmraid-${VERSION_DMRAID}.tar.bz2
-		mirror://kernel/linux/utils/raid/mdadm/mdadm-${VERSION_MDADM}.tar.bz2
+		mirror://kernel/linux/utils/raid/mdadm/mdadm-${VERSION_MDADM}.tar.xz
 		${RH_HOME}/lvm2/LVM2.${VERSION_LVM}.tgz
 		${RH_HOME}/lvm2/old/LVM2.${VERSION_LVM}.tgz
 		${BB_HOME}/busybox-${VERSION_BUSYBOX}.tar.bz2
@@ -58,6 +58,7 @@ RDEPEND="${DEPEND}
 	cryptsetup? ( sys-fs/cryptsetup )
 	app-arch/cpio
 	>=app-misc/pax-utils-1.2.2
+	sys-apps/util-linux[static-libs(+)]
 	firmware? ( sys-kernel/linux-firmware )
 	!<sys-apps/openrc-0.9.9"
 # pax-utils is used for lddtree

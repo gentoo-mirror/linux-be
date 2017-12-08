@@ -1,0 +1,18 @@
+chown -R portage:portage ci/overlay
+mv ci/overlay /usr/local/portage
+echo 'PORTDIR_OVERLAY="/usr/local/portage"' >> /etc/portage/make.conf
+echo "dev-vcs/git -gpg -iconv -nls -pcre -perl -python -webdav" >> /etc/portage/package.use/git
+
+cat >> /etc/portage/package.accept_keywords <<EOF
+
+=sys-fs/zfs-9999 **
+=sys-kernel/spl-9999 **
+=sys-fs/zfs-kmod-9999 **
+EOF
+
+# export zfs_LIVE_REPO=...
+# export zfs-kmod_LIVE_REPO=...
+# export zfs_LIVE_BRANCH=...
+# export zfs-kmod_LIVE_BRANCH=...
+
+emerge -avt {spl,zfs{,-kmod}}::linux-be

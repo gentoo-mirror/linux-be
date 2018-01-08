@@ -24,6 +24,7 @@ IUSE="custom-cflags debug kernel-builtin +rootfs test-suite static-libs"
 RESTRICT="test"
 
 COMMON_DEPEND="
+	net-libs/libtirpc
 	sys-apps/util-linux[static-libs?]
 	sys-libs/zlib[static-libs(+)?]
 	virtual/awk

@@ -8,7 +8,6 @@ if [ ${PV} == "9999" ] ; then
 	inherit git-r3 linux-mod
 	AUTOTOOLS_AUTORECONF="1"
 	EGIT_REPO_URI="git@gitlab.com:linux-be/${PN}.git"
-	EGIT_BRANCH="master"
 else
 	SRC_URI="https://github.com/zfsonlinux/${PN}/releases/download/${P}/${P}.tar.gz"
 	KEYWORDS="~amd64 ~arm ~ppc ~ppc64"

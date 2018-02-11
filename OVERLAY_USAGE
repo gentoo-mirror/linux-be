@@ -1,7 +1,16 @@
-chown -R portage:portage ci/overlay
-mv ci/overlay /usr/local/portage
-echo 'PORTDIR_OVERLAY="/usr/local/portage"' >> /etc/portage/make.conf
-echo "dev-vcs/git -gpg -iconv -nls -pcre -perl -python -webdav" >> /etc/portage/package.use/git
+installed_overlay=/var/git/linux-be
+
+rsync -av --del . $installed_overlay
+chown -R portage:portage $installed_overlay
+
+cat >> /etc/portage/repos.conf/linux-be << EOF
+[linux-be]
+location = $installed_overlay
+auto-sync = no
+EOF
+
+# To install a minimal git:
+# echo "dev-vcs/git -gpg -iconv -nls -pcre -perl -python -webdav" >> /etc/portage/package.use/git
 
 mkdir -p /etc/portage/package.accept_keywords
 cat >> /etc/portage/package.accept_keywords/main <<EOF

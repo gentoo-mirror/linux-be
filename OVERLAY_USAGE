@@ -28,4 +28,4 @@ mkdir -p /var/tmp/portage/.ssh
 ssh-keyscan gitlab.com >> /var/tmp/portage/.ssh/known_hosts
 chown -R portage:portage /var/tmp/portage/.ssh
 
-emerge -avt {zfs{,-kmod},genkernel}::linux-be \~spl-9999
+emerge -avt {zfs{,-kmod},grub,genkernel}::linux-be \~spl-9999

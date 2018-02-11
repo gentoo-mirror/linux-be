@@ -3,7 +3,8 @@ mv ci/overlay /usr/local/portage
 echo 'PORTDIR_OVERLAY="/usr/local/portage"' >> /etc/portage/make.conf
 echo "dev-vcs/git -gpg -iconv -nls -pcre -perl -python -webdav" >> /etc/portage/package.use/git
 
-cat >> /etc/portage/package.accept_keywords <<EOF
+mkdir -p /etc/portage/package.accept_keywords
+cat >> /etc/portage/package.accept_keywords/main <<EOF
 
 # For linux-be
 =sys-fs/zfs-9999 **

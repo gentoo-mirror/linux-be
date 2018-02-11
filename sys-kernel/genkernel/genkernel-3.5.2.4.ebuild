@@ -112,6 +112,8 @@ src_prepare() {
 		"${S}"/defaults/software.sh \
 		|| die "Could not adjust versions"
 
+	epatch "${FILESDIR}"/${P}-0001-Fix-typo-in-checking-for-mountpoint-legacy.patch
+	epatch "${FILESDIR}"/${P}-0002-ci-1-Mount-child-datasets-of-the-root-too.patch
 	epatch_user
 }
 

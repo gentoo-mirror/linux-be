@@ -5,6 +5,7 @@ echo "dev-vcs/git -gpg -iconv -nls -pcre -perl -python -webdav" >> /etc/portage/
 
 cat >> /etc/portage/package.accept_keywords <<EOF
 
+# For linux-be
 =sys-fs/zfs-9999 **
 =sys-kernel/spl-9999 **
 =sys-fs/zfs-kmod-9999 **

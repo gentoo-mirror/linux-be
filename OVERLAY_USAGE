@@ -19,6 +19,7 @@ cat >> /etc/portage/package.accept_keywords/main <<EOF
 =sys-fs/zfs-9999 **
 =sys-kernel/spl-9999 **
 =sys-fs/zfs-kmod-9999 **
+=sys-apps/bemerge-9999 ~amd64
 EOF
 
 mkdir -p /var/tmp/portage/.ssh
@@ -28,4 +29,4 @@ mkdir -p /var/tmp/portage/.ssh
 ssh-keyscan gitlab.com >> /var/tmp/portage/.ssh/known_hosts
 chown -R portage:portage /var/tmp/portage/.ssh
 
-emerge -avt {zfs{,-kmod},grub,genkernel}::linux-be \~spl-9999
+emerge -avt {zfs{,-kmod},grub,genkernel,bemerge}::linux-be \~spl-9999

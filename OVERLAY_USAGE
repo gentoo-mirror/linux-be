@@ -21,4 +21,11 @@ cat >> /etc/portage/package.accept_keywords/main <<EOF
 =sys-fs/zfs-kmod-9999 **
 EOF
 
+mkdir -p /var/tmp/portage/.ssh
+# Add an SSH key to /var/tmp/portage/.ssh/
+# and add it as a deploy key to linux-be/{zfs,grub,bemerge} repositories.
+
+ssh-keyscan gitlab.com >> /var/tmp/portage/.ssh/known_hosts
+chown -R portage:portage /var/tmp/portage/.ssh
+
 emerge -avt zfs{,-kmod}::linux-be \~spl-9999

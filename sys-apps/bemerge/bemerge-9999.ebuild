@@ -6,7 +6,7 @@ EAPI=6
 DESCRIPTION="emerge wrapper for boot environments"
 HOMEPAGE="https://gitlab.com/linux-be/bemerge"
 inherit git-r3
-EGIT_REPO_URI="https://gitlab.com/linux-be/bemerge.git"
+EGIT_REPO_URI="git@gitlab.com:linux-be/${PN}.git"
 
 LICENSE="GPL-2"
 SLOT="0"

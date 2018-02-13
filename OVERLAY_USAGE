@@ -20,6 +20,7 @@ cat >> /etc/portage/package.accept_keywords/main <<EOF
 =sys-kernel/spl-9999 **
 =sys-fs/zfs-kmod-9999 **
 =sys-apps/bemerge-9999 ~amd64
+=sys-apps/genkernel-3.5.2.4 ~amd64
 EOF
 
 mkdir -p /var/tmp/portage/.ssh

@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="5"
@@ -6,7 +6,6 @@ EAPI="5"
 if [ ${PV} == "9999" ]; then
 	AUTOTOOLS_AUTORECONF="1"
 	EGIT_REPO_URI="git@gitlab.com:linux-be/zfs.git"
-	EGIT_BRANCH="master"
 	inherit git-r3
 else
 	SRC_URI="https://github.com/zfsonlinux/zfs/releases/download/zfs-${PV}/zfs-${PV}.tar.gz"

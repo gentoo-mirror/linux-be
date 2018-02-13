@@ -1,0 +1,25 @@
+From a0b9b9da6d3df30b4109e6f747d24e7a3942b6fa Mon Sep 17 00:00:00 2001
+From: Vitaut Bajaryn <vitaut.bayaryn@gmail.com>
+Date: Sun, 11 Feb 2018 01:32:13 +0100
+Subject: [PATCH 1/2] Fix typo in checking for mountpoint=legacy
+
+---
+ defaults/linuxrc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/defaults/linuxrc b/defaults/linuxrc
+index 7fd32f0..4f22217 100644
+--- a/defaults/linuxrc
++++ b/defaults/linuxrc
+@@ -632,7 +632,7 @@ do
+ 
+ 		if [ "${ROOTFSTYPE}" = 'zfs' ]
+ 		then
+-			if [ "zfs get -H -o value mountpoint ${REAL_ROOT}" = 'legacy' ]
++			if [ "$(zfs get -H -o value mountpoint ${REAL_ROOT})" = 'legacy' ]
+ 			then
+ 				MOUNT_STATE=rw
+ 			else
+-- 
+2.11.1
+

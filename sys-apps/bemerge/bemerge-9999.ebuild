@@ -13,7 +13,7 @@ SLOT="0"
 KEYWORDS="~amd64"
 IUSE="-doc"
 
-RDEPEND=">=sys-fs/zfs-9999"
+RDEPEND="sys-fs/zfs"
 DEPEND="${RDEPEND}
 	doc? ( app-doc/doxygen )"
 

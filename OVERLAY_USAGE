@@ -16,11 +16,27 @@ mkdir -p /etc/portage/package.accept_keywords
 cat >> /etc/portage/package.accept_keywords/main <<EOF
 
 # For linux-be
-=sys-fs/zfs-9999 **
-=sys-kernel/spl-9999 **
-=sys-fs/zfs-kmod-9999 **
 =sys-apps/bemerge-9999 ~amd64
 =sys-apps/genkernel-3.5.2.4 ~amd64
+EOF
+
+# There are multiple branches of zfs with beadm:
+# - one based on zfs's master branch,
+# - one based on zfs's zfs-0.7-release branch.
+# libbe and beadm have the same functionality in either of them.
+
+# To use the version based on zfs master:
+cat >> /etc/portage/package.accept_keywords/main <<EOF
+=sys-fs/zfs-9999 **
+=sys-fs/zfs-kmod-9999 **
+=sys-kernel/spl-9999 **
+EOF
+
+# To use the version based on zfs-0.7-release:
+cat >> /etc/portage/package.accept_keywords/main <<EOF
+=sys-fs/zfs-0.7.9999 **
+=sys-fs/zfs-kmod-0.7.9999 **
+=sys-kernel/spl-0.7.9999 **
 EOF
 
 mkdir -p /var/tmp/portage/.ssh
@@ -30,4 +46,4 @@ mkdir -p /var/tmp/portage/.ssh
 ssh-keyscan gitlab.com >> /var/tmp/portage/.ssh/known_hosts
 chown -R portage:portage /var/tmp/portage/.ssh
 
-emerge -avt {zfs{,-kmod},grub,genkernel,bemerge}::linux-be \~spl-9999
+emerge -avt {zfs{,-kmod},grub,genkernel,bemerge}::linux-be spl

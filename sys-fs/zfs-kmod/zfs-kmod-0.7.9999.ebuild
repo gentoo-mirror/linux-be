@@ -3,9 +3,10 @@
 
 EAPI="5"
 
-if [ ${PV} == "9999" ]; then
+if [[ ${PV} == *"9999" ]] ; then
 	AUTOTOOLS_AUTORECONF="1"
 	EGIT_REPO_URI="git@gitlab.com:linux-be/zfs.git"
+	EGIT_BRANCH="zfs-0.7-beadm"
 	inherit git-r3
 else
 	SRC_URI="https://github.com/zfsonlinux/zfs/releases/download/zfs-${PV}/zfs-${PV}.tar.gz"
@@ -65,8 +66,8 @@ pkg_setup() {
 
 	kernel_is ge 2 6 32 || die "Linux 2.6.32 or newer required"
 
-	[ ${PV} != "9999" ] && \
-		{ kernel_is le 4 13 || die "Linux 4.13 is the latest supported version."; }
+	[[ ${PV} != *"9999" ]] && \
+		{ kernel_is le 4 15 || die "Linux 4.15 is the latest supported version."; }
 
 	check_extra_config
 }
@@ -76,7 +77,7 @@ src_prepare() {
 	use debug || sed -e 's/^subdir-m += zpios$//' -i "${S}/module/Makefile.in"
 
 	# Set module revision number
-	[ ${PV} != "9999" ] && \
+	[[ ${PV} != *"9999" ]] && \
 		{ sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" "${S}/META" || die "Could not set Gentoo release"; }
 
 	autotools-utils_src_prepare

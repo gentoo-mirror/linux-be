@@ -10,7 +10,7 @@ auto-sync = no
 EOF
 
 # To install a minimal git:
-# echo "dev-vcs/git -gpg -iconv -nls -pcre -perl -python -webdav" >> /etc/portage/package.use/git
+# echo "dev-vcs/git -gpg -iconv -nls -pcre-jit -pcre -perl -python -webdav" >> /etc/portage/package.use/git
 
 mkdir -p /etc/portage/package.accept_keywords
 cat >> /etc/portage/package.accept_keywords/main <<EOF

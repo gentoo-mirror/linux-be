@@ -22,7 +22,7 @@ cat >> /etc/portage/package.accept_keywords/main <<EOF
 
 # For linux-be
 =sys-apps/bemerge-9999 ~amd64
-=sys-apps/genkernel-3.5.2.4 ~amd64
+=sys-kernel/genkernel-3.5.2.4 ~amd64
 =sys-boot/grub-9999 **
 EOF
 

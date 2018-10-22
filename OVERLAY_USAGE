@@ -1,3 +1,10 @@
+# To install a minimal git:
+# echo "dev-vcs/git -gpg -iconv -nls -pcre-jit -pcre -perl -python -webdav" >> /etc/portage/package.use/git
+# emerge -avt dev-vcs/git
+
+git clone https://gitlab.com/linux-be/overlay.git
+cd overlay
+
 installed_overlay=/var/git/linux-be
 
 rsync -av --del . $installed_overlay
@@ -8,9 +15,6 @@ cat >> /etc/portage/repos.conf/linux-be << EOF
 location = $installed_overlay
 auto-sync = no
 EOF
-
-# To install a minimal git:
-# echo "dev-vcs/git -gpg -iconv -nls -pcre-jit -pcre -perl -python -webdav" >> /etc/portage/package.use/git
 
 mkdir -p /etc/portage/package.accept_keywords
 cat >> /etc/portage/package.accept_keywords/main <<EOF

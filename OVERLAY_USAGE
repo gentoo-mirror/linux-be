@@ -10,6 +10,7 @@ installed_overlay=/var/git/linux-be
 rsync -av --del . $installed_overlay
 chown -R portage:portage $installed_overlay
 
+mkdir -p /etc/portage/repos.conf
 cat >> /etc/portage/repos.conf/linux-be << EOF
 [linux-be]
 location = $installed_overlay

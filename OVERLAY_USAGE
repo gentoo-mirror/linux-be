@@ -17,6 +17,12 @@ location = $installed_overlay
 auto-sync = no
 EOF
 
+mkdir -p /etc/portage/package.use
+cat >> /etc/portage/package.use/main <<EOF
+# For linux-be
+sys-kernel/genkernel zfs
+EOF
+
 mkdir -p /etc/portage/package.accept_keywords
 cat >> /etc/portage/package.accept_keywords/main <<EOF
 

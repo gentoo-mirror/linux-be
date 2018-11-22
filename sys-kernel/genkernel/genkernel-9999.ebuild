@@ -49,12 +49,13 @@ HOMEPAGE="https://www.gentoo.org"
 LICENSE="GPL-2"
 SLOT="0"
 RESTRICT=""
-IUSE="cryptsetup ibm +firmware selinux"
+IUSE="cryptsetup zfs ibm +firmware selinux"
 
 DEPEND="sys-fs/e2fsprogs
 	selinux? ( sys-libs/libselinux )"
 RDEPEND="${DEPEND}
 	cryptsetup? ( sys-fs/cryptsetup )
+	zfs? ( sys-fs/zfs:0/libbe )
 	app-arch/cpio
 	>=app-misc/pax-utils-1.2.2
 	sys-apps/util-linux[static-libs(+)]

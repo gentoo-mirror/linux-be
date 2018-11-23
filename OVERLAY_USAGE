@@ -1,16 +1,21 @@
+# To install a minimal git:
+# echo "dev-vcs/git -gpg -iconv -nls -pcre-jit -pcre -perl -python -webdav" >> /etc/portage/package.use/git
+# emerge -avt dev-vcs/git
+
+git clone https://gitlab.com/linux-be/overlay.git
+cd overlay
+
 installed_overlay=/var/git/linux-be
 
 rsync -av --del . $installed_overlay
 chown -R portage:portage $installed_overlay
 
+mkdir -p /etc/portage/repos.conf
 cat >> /etc/portage/repos.conf/linux-be << EOF
 [linux-be]
 location = $installed_overlay
 auto-sync = no
 EOF
-
-# To install a minimal git:
-# echo "dev-vcs/git -gpg -iconv -nls -pcre-jit -pcre -perl -python -webdav" >> /etc/portage/package.use/git
 
 mkdir -p /etc/portage/package.accept_keywords
 cat >> /etc/portage/package.accept_keywords/main <<EOF
@@ -39,12 +44,5 @@ cat >> /etc/portage/package.accept_keywords/main <<EOF
 =sys-fs/zfs-kmod-0.7.9999 **
 =sys-kernel/spl-0.7.9999 **
 EOF
-
-mkdir -p /var/tmp/portage/.ssh
-# Add an SSH key to /var/tmp/portage/.ssh/
-# and add it as a deploy key to linux-be/{zfs,grub,bemerge} repositories.
-
-ssh-keyscan gitlab.com >> /var/tmp/portage/.ssh/known_hosts
-chown -R portage:portage /var/tmp/portage/.ssh
 
 emerge -avt {zfs{,-kmod},grub,genkernel,bemerge}::linux-be spl

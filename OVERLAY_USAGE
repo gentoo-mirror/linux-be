@@ -17,12 +17,18 @@ location = $installed_overlay
 auto-sync = no
 EOF
 
+mkdir -p /etc/portage/package.use
+cat >> /etc/portage/package.use/main <<EOF
+# For linux-be
+sys-kernel/genkernel zfs
+EOF
+
 mkdir -p /etc/portage/package.accept_keywords
 cat >> /etc/portage/package.accept_keywords/main <<EOF
 
 # For linux-be
 =sys-apps/bemerge-9999 ~amd64
-=sys-apps/genkernel-3.5.2.4 ~amd64
+=sys-kernel/genkernel-9999 **
 =sys-boot/grub-9999 **
 EOF
 

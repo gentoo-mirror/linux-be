@@ -32,8 +32,7 @@ COMMON_URI="${DM_HOME}/dmraid-${VERSION_DMRAID}.tar.bz2
 
 if [[ ${PV} == 9999* ]]
 then
-	EGIT_REPO_URI="git://anongit.gentoo.org/proj/${PN}.git
-		https://anongit.gentoo.org/git/proj/${PN}.git"
+	EGIT_REPO_URI="https://gitlab.com/linux-be/${PN}.git"
 	inherit git-2 bash-completion-r1 eutils
 	S="${WORKDIR}/${PN}"
 	SRC_URI="${COMMON_URI}"
@@ -50,12 +49,13 @@ HOMEPAGE="https://www.gentoo.org"
 LICENSE="GPL-2"
 SLOT="0"
 RESTRICT=""
-IUSE="cryptsetup ibm +firmware selinux"
+IUSE="cryptsetup zfs ibm +firmware selinux"
 
 DEPEND="sys-fs/e2fsprogs
 	selinux? ( sys-libs/libselinux )"
 RDEPEND="${DEPEND}
 	cryptsetup? ( sys-fs/cryptsetup )
+	zfs? ( sys-fs/zfs:0/libbe )
 	app-arch/cpio
 	>=app-misc/pax-utils-1.2.2
 	sys-apps/util-linux[static-libs(+)]
@@ -112,8 +112,6 @@ src_prepare() {
 		"${S}"/defaults/software.sh \
 		|| die "Could not adjust versions"
 
-	epatch "${FILESDIR}"/${P}-0001-Fix-typo-in-checking-for-mountpoint-legacy.patch
-	epatch "${FILESDIR}"/${P}-0002-ci-1-Mount-child-datasets-of-the-root-too.patch
 	epatch_user
 }
 

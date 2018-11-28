@@ -33,7 +33,6 @@ fi
 
 PATCHES=(
 	"${FILESDIR}"/gfxpayload.patch
-	"${FILESDIR}"/grub-2.02_beta2-KERNEL_GLOBS.patch
 )
 
 DEJAVU=dejavu-sans-ttf-2.37

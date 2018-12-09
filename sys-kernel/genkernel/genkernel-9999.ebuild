@@ -1,7 +1,7 @@
 # Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-# genkernel-9999        -> latest Git branch "master"
+# genkernel-9999        -> latest Git HEAD
 # genkernel-VERSION     -> normal genkernel release
 
 EAPI=5 # approved 2012.09.11, required by all profiles since 2014.03.12
@@ -33,8 +33,7 @@ COMMON_URI="${DM_HOME}/dmraid-${VERSION_DMRAID}.tar.bz2
 if [[ ${PV} == 9999* ]]
 then
 	EGIT_REPO_URI="https://gitlab.com/linux-be/${PN}.git"
-	inherit git-2 bash-completion-r1 eutils
-	S="${WORKDIR}/${PN}"
+	inherit git-r3 bash-completion-r1 eutils
 	SRC_URI="${COMMON_URI}"
 else
 	inherit bash-completion-r1 eutils
@@ -79,7 +78,7 @@ pkg_pretend() {
 
 src_unpack() {
 	if [[ ${PV} == 9999* ]] ; then
-		git-2_src_unpack
+		git-r3_src_unpack
 	else
 		unpack ${P}.tar.xz
 	fi

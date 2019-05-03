@@ -1,0 +1,12 @@
+DEFINED_PHASES=compile install postinst unpack
+DEPEND=sys-fs/zfs:0/libbe doc? ( app-doc/doxygen ) >=dev-vcs/git-1.8.2.1[curl]
+DESCRIPTION=emerge wrapper for boot environments
+EAPI=6
+HOMEPAGE=https://gitlab.com/linux-be/bemerge
+IUSE=-doc
+KEYWORDS=~amd64
+LICENSE=GPL-2
+RDEPEND=sys-fs/zfs:0/libbe
+SLOT=0
+_eclasses_=git-r3	0d4635eeb5a96cd5315597a47eba25c9
+_md5_=55e0f323f1ad8bac054032391e211e77

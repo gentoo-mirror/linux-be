@@ -18,19 +18,10 @@ auto-sync = no
 EOF
 
 mkdir -p /etc/portage/package.use
-cat >> /etc/portage/package.use/main <<EOF
-# For linux-be
-sys-kernel/genkernel zfs
-EOF
+ln -s "$installed_overlay"/Documentation/package.use/linux-be.use /etc/portage/package.use/
 
 mkdir -p /etc/portage/package.accept_keywords
-cat >> /etc/portage/package.accept_keywords/main <<EOF
-
-# For linux-be
-=sys-apps/bemerge-9999 ~amd64
-=sys-kernel/genkernel-9999 **
-=sys-boot/grub-9999 **
-EOF
+ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be.keywords /etc/portage/package.accept_keywords/
 
 # There are multiple branches of zfs with beadm:
 # - one based on zfs's master branch,
@@ -38,17 +29,9 @@ EOF
 # libbe and beadm have the same functionality in either of them.
 
 # To use the version based on zfs master:
-cat >> /etc/portage/package.accept_keywords/main <<EOF
-=sys-fs/zfs-9999 **
-=sys-fs/zfs-kmod-9999 **
-=sys-kernel/spl-9999 **
-EOF
+ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be-zfs-master.keywords /etc/portage/package.accept_keywords/
 
 # To use the version based on zfs-0.7-release:
-cat >> /etc/portage/package.accept_keywords/main <<EOF
-=sys-fs/zfs-0.7.9999 **
-=sys-fs/zfs-kmod-0.7.9999 **
-=sys-kernel/spl-0.7.9999 **
-EOF
+ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be-zfs-0.7.keywords /etc/portage/package.accept_keywords/
 
 emerge -avt {zfs{,-kmod},grub,genkernel,bemerge}::linux-be spl

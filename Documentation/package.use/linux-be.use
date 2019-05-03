@@ -1,1 +1,3 @@
 sys-kernel/genkernel zfs
+# required by genkernel
+sys-apps/util-linux static-libs

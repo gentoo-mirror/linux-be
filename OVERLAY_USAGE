@@ -34,4 +34,4 @@ ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be-zfs-ma
 # To use the version based on zfs-0.7-release:
 ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be-zfs-0.7.keywords /etc/portage/package.accept_keywords/
 
-emerge -avt {zfs{,-kmod},grub,genkernel,bemerge}::linux-be spl
+emerge -avt {zfs{,-kmod},grub,genkernel,bemerge}::linux-be

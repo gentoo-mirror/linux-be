@@ -1,0 +1,4 @@
+sys-kernel/genkernel zfs
+sys-boot/grub libzfs
+# required by genkernel
+sys-apps/util-linux static-libs

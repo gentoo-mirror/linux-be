@@ -9,25 +9,16 @@ RUN mkdir /etc/portage/repos.conf &&\
     auto-sync = no"\
     >> /etc/portage/repos.conf/linux-be
 
+RUN mkdir -p /etc/portage/package.use &&\
+    cd /etc/portage/package.use &&\
+    ln -s "$installed_overlay"/Documentation/package.use/linux-be.use
+
 RUN mkdir -p /etc/portage/package.accept_keywords &&\
-    echo -e "\
-    # unmask everything in linux-be\n\
-    */*::linux-be ~amd64"\
-    >> /etc/portage/package.accept_keywords/main
+    cd /etc/portage/package.accept_keywords &&\
+    ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be.keywords &&\
+    ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be-zfs-master.keywords &&\
+    ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be-zfs-0.7.keywords
 
-RUN echo -e "\
-    # For branch following master\n\
-    =sys-fs/zfs-9999 **\n\
-    =sys-fs/zfs-kmod-9999 **\n\
-    =sys-kernel/spl-9999 **"\
-    >> /etc/portage/package.accept_keywords/master
-
-RUN echo -e "\
-    # For branch following lastest release\n\
-    =sys-fs/zfs-0.7.9999 **\n\
-    =sys-fs/zfs-kmod-0.7.9999 **\n\
-    =sys-kernel/spl-0.7.9999 **"\
-    >> /etc/portage/package.accept_keywords/release
 
 COPY --from=portage /usr/portage /usr/portage
 

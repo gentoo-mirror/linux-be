@@ -19,8 +19,8 @@ ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be.keywor
 ```
 
 There are multiple branches of `zfs` with `beadm`:
-- one based on `zfs`'s `master` branch,
-- one based on `zfs`'s `zfs-0.7-release` branch.
+- one based on [zfsonlinux/zfs](https://github.com/zfsonlinux/zfs) `master` branch,
+- one based on [zfsonlinux/zfs](https://github.com/zfsonlinux/zfs) `zfs-0.7-release` branch.
 
 `libbe` and `beadm` have the same functionality in either of them.
 

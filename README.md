@@ -38,3 +38,5 @@ Install all the packages:
 ```
 emerge -avt {zfs{,-kmod},grub,genkernel,bemerge}::linux-be
 ```
+
+Finish the installation as in [Installing linux-be](https://gitlab.com/linux-be/zfs/wikis/linux-be-installation/Installing-linux-be).

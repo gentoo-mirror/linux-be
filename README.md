@@ -5,12 +5,12 @@
 Add the repository using [Layman](https://wiki.gentoo.org/wiki/Layman):
 ```
 yes | layman -a linux-be
-
-installed_overlay=/var/lib/layman/linux-be
 ```
 
 Set the required useflags and accept the keywords:
 ```
+installed_overlay="$(portageq get_repo_path / linux-be)"
+
 mkdir -p /etc/portage/package.use
 ln -s "$installed_overlay"/Documentation/package.use/linux-be.use /etc/portage/package.use/
 

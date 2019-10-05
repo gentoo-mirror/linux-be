@@ -4,13 +4,14 @@
 EAPI="5"
 PYTHON_COMPAT=( python{2_7,3_5,3_6} )
 
-if [[ ${PV} == "9999" ]] ; then
+if [[ ${PV} == *"9999" ]] ; then
 	AUTOTOOLS_AUTORECONF="1"
 	EGIT_REPO_URI="https://github.com/zfsonlinux/${PN}.git"
+	EGIT_BRANCH="spl-0.7-release"
 	inherit git-r3
 else
 	SRC_URI="https://github.com/zfsonlinux/zfs/releases/download/zfs-${PV}/${P}.tar.gz"
-	KEYWORDS="amd64"
+	KEYWORDS="~amd64 ~arm ~ppc ~ppc64"
 fi
 
 inherit flag-o-matic linux-info linux-mod python-single-r1 autotools-utils
@@ -61,8 +62,8 @@ pkg_setup() {
 
 	kernel_is ge 2 6 32 || die "Linux 2.6.32 or newer required"
 
-	[ ${PV} != "9999" ] && \
 		{ kernel_is le 5 0 || die "Linux 5.0 is the latest supported version."; }
+	[ ${PV} != *"9999" ] && \
 
 	check_extra_config
 }
@@ -76,7 +77,7 @@ src_prepare() {
 	use debug || { sed -e 's/^subdir-m += splat$//' -i "${S}/module/Makefile.in" || die ; }
 
 	# Set module revision number
-	[ ${PV} != "9999" ] && \
+	[ ${PV} != *"9999" ] && \
 		{ sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" "${S}/META" || die "Could not set Gentoo release"; }
 
 	autotools-utils_src_prepare

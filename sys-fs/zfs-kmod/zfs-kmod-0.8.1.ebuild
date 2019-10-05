@@ -10,16 +10,16 @@ HOMEPAGE="https://zfsonlinux.org/"
 
 if [[ ${PV} == "9999" ]]; then
 	inherit autotools git-r3
-	EGIT_REPO_URI="https://gitlab.com/linux-be/zfs.git"
+	EGIT_REPO_URI="https://github.com/zfsonlinux/zfs.git"
 else
 	SRC_URI="https://github.com/zfsonlinux/zfs/releases/download/zfs-${PV}/zfs-${PV}.tar.gz"
-	KEYWORDS="~amd64 ~arm64 ~ppc64"
+	KEYWORDS="~amd64 ~ppc64"
 	S="${WORKDIR}/zfs-${PV}"
 	ZFS_KERNEL_COMPAT="5.1"
 fi
 
 LICENSE="CDDL debug? ( GPL-2+ )"
-SLOT="0/libbe"
+SLOT="0"
 IUSE="custom-cflags debug +rootfs"
 
 DEPEND=""

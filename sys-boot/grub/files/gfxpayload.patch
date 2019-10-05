@@ -13,7 +13,7 @@ diff --git a/util/grub-mkconfig-linux_lib.in b/util/grub-mkconfig-linux_lib.in
 index d2e2a8f..a54b888 100644
 --- a/util/grub-mkconfig-linux_lib.in
 +++ b/util/grub-mkconfig-linux_lib.in
-@@ -104,7 +104,9 @@ linux_entry ()
+@@ -104,8 +104,9 @@ linux_entry ()
        echo "	load_video" | sed "s/^/$submenu_indentation/"
        if grep -qx "CONFIG_FB_EFI=y" "${config}" 2> /dev/null \
  	  && grep -qx "CONFIG_VT_HW_CONSOLE_BINDING=y" "${config}" 2> /dev/null; then

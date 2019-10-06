@@ -83,12 +83,9 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	if [[ ${PV} == "9999" ]]; then
-		eautoreconf
-	else
-		# Set module revision number
-		sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
-	fi
+	eautoreconf
+	# Set module revision number
+	sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
 
 	# Remove GPLv2-licensed ZPIOS unless we are debugging
 	use debug || sed -e 's/^subdir-m += zpios$//' -i module/Makefile.in

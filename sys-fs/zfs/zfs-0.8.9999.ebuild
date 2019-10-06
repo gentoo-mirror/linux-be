@@ -11,7 +11,7 @@ inherit bash-completion-r1 flag-o-matic linux-info linux-mod distutils-r1 system
 DESCRIPTION="Userland utilities for ZFS Linux kernel module"
 HOMEPAGE="https://zfsonlinux.org/"
 
-if [[ ${PV} == "9999" ]] ; then
+if [[ ${PV} == *"9999" ]] ; then
 	inherit autotools git-r3
 	EGIT_REPO_URI="https://gitlab.com/linux-be/${PN}.git"
 else
@@ -98,7 +98,7 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	if [[ ${PV} == "9999" ]]; then
+	if [[ ${PV} == *"9999" ]]; then
 		eautoreconf
 	else
 		# Set revision number
@@ -181,7 +181,7 @@ pkg_postinst() {
 		einfo " use dracut or genkernel-9999 if you requre this functionality"
 	fi
 
-	if ! use kernel-builtin && [[ ${PV} = "9999" ]]; then
+	if ! use kernel-builtin && [[ ${PV} == *"9999" ]]; then
 		einfo "Adding ${P} to the module database to ensure that the"
 		einfo "kernel modules and userland utilities stay in sync."
 		update_moduledb
@@ -244,7 +244,7 @@ pkg_postinst() {
 }
 
 pkg_postrm() {
-	if ! use kernel-builtin && [[ ${PV} == "9999" ]]; then
+	if ! use kernel-builtin && [[ ${PV} == *"9999" ]]; then
 		remove_moduledb
 	fi
 }

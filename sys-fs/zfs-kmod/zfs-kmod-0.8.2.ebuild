@@ -15,7 +15,7 @@ KEYWORDS="~amd64 ~arm64 ~ppc64"
 ZFS_KERNEL_COMPAT="5.3"
 
 LICENSE="CDDL debug? ( GPL-2+ )"
-SLOT="0"
+SLOT="0/libbe"
 IUSE="custom-cflags debug +rootfs"
 
 DEPEND=""

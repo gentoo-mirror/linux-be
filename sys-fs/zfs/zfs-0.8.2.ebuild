@@ -17,7 +17,7 @@ EGIT_COMMIT="zfs-${PV}-beadm"
 KEYWORDS="~amd64 ~arm64 ~ppc64"
 
 LICENSE="BSD-2 CDDL MIT"
-SLOT="0"
+SLOT="0/libbe"
 IUSE="custom-cflags debug kernel-builtin libressl python +rootfs test-suite static-libs"
 
 DEPEND="

@@ -11,13 +11,10 @@ inherit bash-completion-r1 flag-o-matic linux-info linux-mod distutils-r1 system
 DESCRIPTION="Userland utilities for ZFS Linux kernel module"
 HOMEPAGE="https://zfsonlinux.org/"
 
-if [[ ${PV} == "9999" ]] ; then
-	inherit autotools git-r3
-	EGIT_REPO_URI="https://github.com/zfsonlinux/zfs.git"
-else
-	SRC_URI="https://github.com/zfsonlinux/${PN}/releases/download/${P}/${P}.tar.gz"
-	KEYWORDS="~amd64 ~arm64 ~ppc64"
-fi
+inherit autotools git-r3
+EGIT_REPO_URI="https://gitlab.com/linux-be/${PN}.git"
+EGIT_COMMIT="zfs-${PV}-beadm"
+KEYWORDS="~amd64 ~arm64 ~ppc64"
 
 LICENSE="BSD-2 CDDL MIT"
 SLOT="0"

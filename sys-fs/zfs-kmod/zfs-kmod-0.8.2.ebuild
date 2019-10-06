@@ -8,15 +8,11 @@ inherit flag-o-matic linux-info linux-mod toolchain-funcs
 DESCRIPTION="Linux ZFS kernel module for sys-fs/zfs"
 HOMEPAGE="https://zfsonlinux.org/"
 
-if [[ ${PV} == "9999" ]]; then
-	inherit autotools git-r3
-	EGIT_REPO_URI="https://github.com/zfsonlinux/zfs.git"
-else
-	SRC_URI="https://github.com/zfsonlinux/zfs/releases/download/zfs-${PV}/zfs-${PV}.tar.gz"
-	KEYWORDS="~amd64 ~arm64 ~ppc64"
-	S="${WORKDIR}/zfs-${PV}"
-	ZFS_KERNEL_COMPAT="5.3"
-fi
+inherit autotools git-r3
+EGIT_REPO_URI="https://gitlab.com/linux-be/zfs.git"
+EGIT_COMMIT="zfs-${PV}-beadm"
+KEYWORDS="~amd64 ~arm64 ~ppc64"
+ZFS_KERNEL_COMPAT="5.3"
 
 LICENSE="CDDL debug? ( GPL-2+ )"
 SLOT="0"

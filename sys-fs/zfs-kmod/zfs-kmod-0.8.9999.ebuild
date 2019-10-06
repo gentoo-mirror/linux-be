@@ -8,7 +8,7 @@ inherit flag-o-matic linux-info linux-mod toolchain-funcs
 DESCRIPTION="Linux ZFS kernel module for sys-fs/zfs"
 HOMEPAGE="https://zfsonlinux.org/"
 
-if [[ ${PV} == "9999" ]]; then
+if [[ ${PV} == *"9999" ]]; then
 	inherit autotools git-r3
 	EGIT_REPO_URI="https://gitlab.com/linux-be/zfs.git"
 else
@@ -69,7 +69,7 @@ pkg_setup() {
 
 	kernel_is -ge 2 6 32 || die "Linux 2.6.32 or newer required"
 
-	if [[ ${PV} != "9999" ]]; then
+	if [[ ${PV} != *"9999" ]]; then
 		local kv_major_max kv_minor_max zcompat
 		zcompat="${ZFS_KERNEL_COMPAT_OVERRIDE:-${ZFS_KERNEL_COMPAT}}"
 		kv_major_max="${zcompat%%.*}"
@@ -85,7 +85,7 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	if [[ ${PV} == "9999" ]]; then
+	if [[ ${PV} == *"9999" ]]; then
 		eautoreconf
 	else
 		# Set module revision number

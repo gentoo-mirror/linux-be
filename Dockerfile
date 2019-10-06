@@ -20,7 +20,7 @@ RUN mkdir -p /etc/portage/package.accept_keywords &&\
     ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be-zfs-0.7.keywords
 
 
-COPY --from=portage /usr/portage /usr/portage
+COPY --from=portage /var/db/repos/gentoo /var/db/repos/gentoo
 
 RUN echo "dev-vcs/git -gpg -iconv -nls -pcre-jit -pcre -perl -python -webdav" >> /etc/portage/package.use/git
 RUN echo "sys-kernel/gentoo-sources symlink" >> /etc/portage/package.use/kernel

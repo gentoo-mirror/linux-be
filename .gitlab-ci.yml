@@ -11,6 +11,13 @@ build-image:
     - docker build -t $CONTAINER_TEST_IMAGE .
     - docker push $CONTAINER_TEST_IMAGE
 
+verify-repo:
+  image: $CONTAINER_TEST_IMAGE
+  stage: verify
+  script:
+    - emerge app-portage/repoman
+    - repoman --mode scan -xq || exit 0
+
 release-image:
   stage: release
   tags:
@@ -25,4 +32,5 @@ release-image:
 
 stages:
   - build
+  - verify
   - release

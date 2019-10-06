@@ -63,7 +63,7 @@ pkg_setup() {
 	kernel_is ge 2 6 32 || die "Linux 2.6.32 or newer required"
 
 		{ kernel_is le 5 0 || die "Linux 5.0 is the latest supported version."; }
-	[ ${PV} != *"9999" ] && \
+	[ ${PV} != *"9999" ] &&\
 
 	check_extra_config
 }

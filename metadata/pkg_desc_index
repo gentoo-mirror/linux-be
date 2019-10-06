@@ -1,6 +1,6 @@
 sys-apps/bemerge 9999: emerge wrapper for boot environments
 sys-boot/grub 9999: GNU GRUB boot loader
-sys-fs/zfs 0.7.9999 9999: Userland utilities for ZFS Linux kernel module
-sys-fs/zfs-kmod 0.7.9999 9999: Linux ZFS kernel module for sys-fs/zfs
+sys-fs/zfs 0.7.9999 0.8.9999: Userland utilities for ZFS Linux kernel module
+sys-fs/zfs-kmod 0.7.9999 0.8.9999: Linux ZFS kernel module for sys-fs/zfs
 sys-kernel/genkernel 9999: Gentoo automatic kernel building scripts
 sys-kernel/spl 0.7.9999: The Solaris Porting Layer provides many of the Solaris kernel APIs

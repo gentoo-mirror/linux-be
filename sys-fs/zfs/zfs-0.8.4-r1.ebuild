@@ -11,13 +11,10 @@ inherit autotools bash-completion-r1 flag-o-matic linux-info distutils-r1 system
 DESCRIPTION="Userland utilities for ZFS Linux kernel module"
 HOMEPAGE="https://github.com/openzfs/zfs"
 
-if [[ ${PV} == "9999" ]] ; then
-	inherit git-r3 linux-mod
-	EGIT_REPO_URI="https://github.com/openzfs/zfs.git"
-else
-	SRC_URI="https://github.com/openzfs/${PN}/releases/download/${P}/${P}.tar.gz"
-	KEYWORDS="amd64 ~arm64 ~ppc64"
-fi
+inherit git-r3
+EGIT_REPO_URI="https://gitlab.com/linux-be/${PN}.git"
+EGIT_COMMIT="zfs-${PV}-beadm"
+KEYWORDS="amd64 ~arm64 ~ppc64"
 
 LICENSE="BSD-2 CDDL MIT"
 SLOT="0"
@@ -98,12 +95,9 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	if [[ ${PV} == "9999" ]]; then
-		eautoreconf
-	else
-		# Set revision number
-		sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
-	fi
+	eautoreconf
+	# Set revision number
+	sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
 
 	if use python; then
 		pushd contrib/pyzfs >/dev/null || die

@@ -8,15 +8,11 @@ inherit autotools flag-o-matic linux-mod toolchain-funcs
 DESCRIPTION="Linux ZFS kernel module for sys-fs/zfs"
 HOMEPAGE="https://github.com/openzfs/zfs"
 
-if [[ ${PV} == "9999" ]]; then
-	inherit git-r3
-	EGIT_REPO_URI="https://github.com/openzfs/zfs.git"
-else
-	SRC_URI="https://github.com/openzfs/zfs/releases/download/zfs-${PV}/zfs-${PV}.tar.gz"
-	KEYWORDS="amd64 ~arm64 ~ppc64"
-	S="${WORKDIR}/zfs-${PV}"
-	ZFS_KERNEL_COMPAT="5.6"
-fi
+inherit git-r3
+EGIT_REPO_URI="https://gitlab.com/linux-be/zfs.git"
+EGIT_COMMIT="zfs-${PV}-beadm"
+KEYWORDS="amd64 ~arm64 ~ppc64"
+ZFS_KERNEL_COMPAT="5.6"
 
 LICENSE="CDDL debug? ( GPL-2+ )"
 SLOT="0"
@@ -88,12 +84,9 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	if [[ ${PV} == "9999" ]]; then
-		eautoreconf
-	else
-		# Set module revision number
-		sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
-	fi
+	eautoreconf
+	# Set module revision number
+	sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
 }
 
 src_configure() {

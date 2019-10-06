@@ -10,5 +10,9 @@ sys-boot/grub:mount - Build and install the grub-mount utility
 sys-boot/grub:multislot - Allow concurrent installation of sys-boot/grub SLOT 0 and sys-boot/grub SLOT 2 by renaming all programs.
 sys-boot/grub:themes - Build and install GRUB themes (starfield)
 sys-boot/grub:truetype - Build and install grub-mkfont conversion utility
+sys-fs/zfs:kernel-builtin - Disable dependency on sys-fs/zfs-kmod under the assumption that ZFS is part of the kernel source tree
+sys-fs/zfs:rootfs - Enable dependencies required for booting off a pool containing a rootfs
+sys-fs/zfs:test-suite - Install regression test suite
+sys-fs/zfs-kmod:rootfs - Install zfs-shutdown script to support exporting a pool containing rootfs
 sys-kernel/genkernel:cryptsetup - Enable support for Luks disk encryption using sys-fs/cryptsetup
 sys-kernel/genkernel:firmware - Prefer system firmware sys-kernel/linux-firmware over local copy.

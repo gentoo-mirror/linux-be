@@ -12,10 +12,11 @@ build-image:
     - docker push $CONTAINER_TEST_IMAGE
 
 verify-repo:
-  image: $CONTAINER_TEST_IMAGE
+  image:
+    name: chaoslab/repoman
+    entrypoint: [""]
   stage: verify
   script:
-    - emerge app-portage/repoman
     - repoman --mode scan -xq || exit 0
 
 release-image:

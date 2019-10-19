@@ -16,7 +16,7 @@ DESCRIPTION="Userland utilities for ZFS Linux kernel module"
 HOMEPAGE="https://zfsonlinux.org/"
 
 LICENSE="BSD-2 CDDL MIT"
-SLOT="0"
+SLOT="0/libbe"
 IUSE="custom-cflags debug kernel-builtin +rootfs systemd test-suite static-libs"
 RESTRICT="test"
 

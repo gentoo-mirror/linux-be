@@ -15,7 +15,7 @@ DESCRIPTION="Linux ZFS kernel module for sys-fs/zfs"
 HOMEPAGE="https://zfsonlinux.org/"
 
 LICENSE="CDDL debug? ( GPL-2+ )"
-SLOT="0"
+SLOT="0/libbe"
 IUSE="custom-cflags debug +rootfs"
 RESTRICT="debug? ( strip ) test"
 

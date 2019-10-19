@@ -3,15 +3,11 @@
 
 EAPI="5"
 
-if [ ${PV} == "9999" ]; then
-	AUTOTOOLS_AUTORECONF="1"
-	EGIT_REPO_URI="https://github.com/zfsonlinux/zfs.git"
-	inherit git-r3
-else
-	SRC_URI="https://github.com/zfsonlinux/zfs/releases/download/zfs-${PV}/zfs-${PV}.tar.gz"
-	S="${WORKDIR}/zfs-${PV}"
-	KEYWORDS="amd64"
-fi
+AUTOTOOLS_AUTORECONF="1"
+EGIT_REPO_URI="https://github.com/zfsonlinux/zfs.git"
+EGIT_COMMIT="zfs-${PV}-beadm"
+inherit git-r3
+KEYWORDS="amd64"
 
 inherit flag-o-matic linux-info linux-mod toolchain-funcs autotools-utils
 

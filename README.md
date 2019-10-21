@@ -18,20 +18,27 @@ mkdir -p /etc/portage/package.accept_keywords
 ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be.keywords /etc/portage/package.accept_keywords/
 ```
 
-There are multiple branches of `zfs` with `beadm`:
-- one based on [zfsonlinux/zfs](https://github.com/zfsonlinux/zfs) `master` branch,
-- one based on [zfsonlinux/zfs](https://github.com/zfsonlinux/zfs) `zfs-0.7-release` branch.
-
-`libbe` and `beadm` have the same functionality in either of them.
-
-To use the version based on `zfs` `master`:
+To use `zfs` releases with `beadm` based on ZFSonLinux 0.8.x:
 ```
-ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be-zfs-master.keywords /etc/portage/package.accept_keywords/
+ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be-zfs-0.8.keywords /etc/portage/package.accept_keywords/
 ```
 
-To use the version based on `zfs-0.7-release`:
+To use `zfs` releases with `beadm` based on ZFSonLinux 0.7.x:
 ```
 ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be-zfs-0.7.keywords /etc/portage/package.accept_keywords/
+```
+
+Live `zfs*` ebuilds are also provided for testing untagged commits or
+testing with officially unsupported kernel versions.
+
+To use live `zfs*` ebuilds that fetch code from the `master` branch (based on `zfsonlinux/zfs` `zfs-0.8-release` branch):
+```
+ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be-zfs-0.7.9999.keywords /etc/portage/package.accept_keywords/
+```
+
+To use live `zfs*` ebuilds that fetch code from the `zfs-0.7-beadm` branch (based on `zfsonlinux/zfs` `zfs-0.7-release` branch):
+```
+ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be-zfs-0.7.9999.keywords /etc/portage/package.accept_keywords/
 ```
 
 Install all the packages:

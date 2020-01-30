@@ -32,6 +32,6 @@ release-image:
     - master
 
 stages:
-  - build
   - verify
+  - build
   - release

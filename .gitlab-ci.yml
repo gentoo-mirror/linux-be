@@ -11,6 +11,14 @@ build-image:
     - docker build -t $CONTAINER_TEST_IMAGE .
     - docker push $CONTAINER_TEST_IMAGE
 
+verify-repo:
+  image:
+    name: chaoslab/repoman
+    entrypoint: [""]
+  stage: verify
+  script:
+    - repoman --mode scan -xq || exit 0
+
 release-image:
   stage: release
   tags:
@@ -24,5 +32,6 @@ release-image:
     - master
 
 stages:
+  - verify
   - build
   - release

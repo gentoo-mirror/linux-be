@@ -1,9 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-inherit flag-o-matic linux-info linux-mod toolchain-funcs
+inherit flag-o-matic linux-mod toolchain-funcs
 
 DESCRIPTION="Linux ZFS kernel module for sys-fs/zfs"
 HOMEPAGE="https://zfsonlinux.org/"
@@ -12,16 +12,15 @@ inherit autotools git-r3
 EGIT_REPO_URI="https://gitlab.com/linux-be/zfs.git"
 EGIT_COMMIT="zfs-${PV}-beadm"
 KEYWORDS="~amd64 ~arm64 ~ppc64"
-ZFS_KERNEL_COMPAT="5.3"
+ZFS_KERNEL_COMPAT="5.4"
 
 LICENSE="CDDL debug? ( GPL-2+ )"
-SLOT="0/libbe"
+SLOT="0"
 IUSE="custom-cflags debug +rootfs"
 
 DEPEND=""
 
 RDEPEND="${DEPEND}
-	!sys-fs/zfs-fuse
 	!sys-kernel/spl
 "
 
@@ -35,8 +34,6 @@ RESTRICT="debug? ( strip ) test"
 DOCS=( AUTHORS COPYRIGHT META README.md )
 
 pkg_setup() {
-	linux-info_pkg_setup
-
 	CONFIG_CHECK="
 		!DEBUG_LOCK_ALLOC
 		EFI_PARTITION
@@ -65,7 +62,7 @@ pkg_setup() {
 
 	kernel_is -lt 5 && CONFIG_CHECK="${CONFIG_CHECK} IOSCHED_NOOP"
 
-	kernel_is -ge 2 6 32 || die "Linux 2.6.32 or newer required"
+	kernel_is -ge 3 10 || die "Linux 3.10 or newer required"
 
 	if [[ ${PV} != "9999" ]]; then
 		local kv_major_max kv_minor_max zcompat
@@ -77,18 +74,18 @@ pkg_setup() {
 			"Linux ${kv_major_max}.${kv_minor_max} is the latest supported version"
 	fi
 
-	check_extra_config
+	linux-mod_pkg_setup
 }
 
 src_prepare() {
 	default
 
-	eautoreconf
-	# Set module revision number
-	sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
-
-	# Remove GPLv2-licensed ZPIOS unless we are debugging
-	use debug || sed -e 's/^subdir-m += zpios$//' -i module/Makefile.in
+	if [[ ${PV} == "9999" ]]; then
+		eautoreconf
+	else
+		# Set module revision number
+		sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
+	fi
 }
 
 src_configure() {

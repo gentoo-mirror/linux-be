@@ -1,10 +1,10 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
 DISTUTILS_OPTIONAL=1
-PYTHON_COMPAT=( python{2_7,3_{5,6,7}} )
+PYTHON_COMPAT=( python{2_7,3_{6,7}} )
 
 inherit bash-completion-r1 flag-o-matic linux-info linux-mod distutils-r1 systemd toolchain-funcs udev usr-ldscript
 
@@ -17,7 +17,7 @@ EGIT_COMMIT="zfs-${PV}-beadm"
 KEYWORDS="~amd64 ~arm64 ~ppc64"
 
 LICENSE="BSD-2 CDDL MIT"
-SLOT="0/libbe"
+SLOT="0"
 IUSE="custom-cflags debug kernel-builtin libressl python +rootfs test-suite static-libs"
 
 DEPEND="
@@ -26,7 +26,7 @@ DEPEND="
 	sys-apps/util-linux[static-libs?]
 	sys-libs/zlib[static-libs(+)?]
 	virtual/awk
-	virtual/libudev[static-libs?]
+	virtual/libudev[static-libs(-)?]
 	libressl? ( dev-libs/libressl:0=[static-libs?] )
 	!libressl? ( dev-libs/openssl:0=[static-libs?] )
 	python? (
@@ -42,19 +42,13 @@ BDEPEND="virtual/awk
 "
 
 RDEPEND="${DEPEND}
-	!=sys-apps/grep-2.13*
 	!kernel-builtin? ( ~sys-fs/zfs-kmod-${PV} )
-	!sys-fs/zfs-fuse
 	!prefix? ( virtual/udev )
 	sys-fs/udev-init-scripts
 	rootfs? (
 		app-arch/cpio
 		app-misc/pax-utils
-		!<sys-boot/grub-2.00-r2:2
 		!<sys-kernel/genkernel-3.5.1.1
-		!<sys-kernel/genkernel-next-67
-		!<sys-kernel/bliss-initramfs-7.1.0
-		!<sys-kernel/dracut-044-r1
 	)
 	test-suite? (
 		sys-apps/util-linux
@@ -71,10 +65,7 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 RESTRICT="test"
 
-PATCHES=(
-	"${FILESDIR}/bash-completion-sudo.patch"
-	"${FILESDIR}/0.8.2-ZPOOL_IMPORT_UDEV_TIMEOUT_MS.patch" # https://github.com/zfsonlinux/zfs/pull/9109
-)
+PATCHES=( "${FILESDIR}/bash-completion-sudo.patch" )
 
 pkg_setup() {
 	if use kernel_linux && use test-suite; then
@@ -101,9 +92,12 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	eautoreconf
-	# Set revision number
-	sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
+	if [[ ${PV} == "9999" ]]; then
+		eautoreconf
+	else
+		# Set revision number
+		sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
+	fi
 
 	if use python; then
 		pushd contrib/pyzfs >/dev/null || die
@@ -118,6 +112,7 @@ src_prepare() {
 
 src_configure() {
 	use custom-cflags || strip-flags
+	python_setup
 
 	local myconf=(
 		--bindir="${EPREFIX}/bin"
@@ -131,6 +126,7 @@ src_configure() {
 		--with-linux="${KV_DIR}"
 		--with-linux-obj="${KV_OUT_DIR}"
 		--with-udevdir="$(get_udevdir)"
+		--with-python="${EPYTHON}"
 		--with-systemdunitdir="$(systemd_get_systemunitdir)"
 		--with-systemdpresetdir="${EPREFIX}/lib/systemd/system-preset"
 		$(use_enable debug)
@@ -139,6 +135,9 @@ src_configure() {
 	)
 
 	econf "${myconf[@]}"
+
+	# temp hack for https://github.com/zfsonlinux/zfs/issues/9443
+	sed -i "s@/usr/local/@"${EPREFIX}/"@g" etc/init.d/zfs-functions || die
 }
 
 src_compile() {
@@ -174,8 +173,8 @@ src_install() {
 	fi
 
 	# enforce best available python implementation
-	python_setup
 	python_fix_shebang "${ED}/bin"
+
 }
 
 pkg_postinst() {

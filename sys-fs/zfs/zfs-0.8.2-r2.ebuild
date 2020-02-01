@@ -11,13 +11,10 @@ inherit bash-completion-r1 flag-o-matic linux-info linux-mod distutils-r1 system
 DESCRIPTION="Userland utilities for ZFS Linux kernel module"
 HOMEPAGE="https://zfsonlinux.org/"
 
-if [[ ${PV} == *"9999" ]] ; then
-	inherit autotools git-r3
-	EGIT_REPO_URI="https://gitlab.com/linux-be/${PN}.git"
-else
-	SRC_URI="https://github.com/zfsonlinux/${PN}/releases/download/${P}/${P}.tar.gz"
-	KEYWORDS="~amd64 ~arm64 ~ppc64"
-fi
+inherit autotools git-r3
+EGIT_REPO_URI="https://gitlab.com/linux-be/${PN}.git"
+EGIT_COMMIT="zfs-${PV}-beadm"
+KEYWORDS="~amd64 ~arm64 ~ppc64"
 
 LICENSE="BSD-2 CDDL MIT"
 SLOT="0/libbe"
@@ -29,7 +26,7 @@ DEPEND="
 	sys-apps/util-linux[static-libs?]
 	sys-libs/zlib[static-libs(+)?]
 	virtual/awk
-	virtual/libudev[static-libs?]
+	virtual/libudev[static-libs(-)?]
 	libressl? ( dev-libs/libressl:0=[static-libs?] )
 	!libressl? ( dev-libs/openssl:0=[static-libs?] )
 	python? (
@@ -45,13 +42,19 @@ BDEPEND="virtual/awk
 "
 
 RDEPEND="${DEPEND}
-	!kernel-builtin? ( ~sys-fs/zfs-kmod-${PV}:0/libbe )
+	!=sys-apps/grep-2.13*
+	!kernel-builtin? ( ~sys-fs/zfs-kmod-${PV} )
+	!sys-fs/zfs-fuse
 	!prefix? ( virtual/udev )
 	sys-fs/udev-init-scripts
 	rootfs? (
 		app-arch/cpio
 		app-misc/pax-utils
+		!<sys-boot/grub-2.00-r2:2
 		!<sys-kernel/genkernel-3.5.1.1
+		!<sys-kernel/genkernel-next-67
+		!<sys-kernel/bliss-initramfs-7.1.0
+		!<sys-kernel/dracut-044-r1
 	)
 	test-suite? (
 		sys-apps/util-linux
@@ -70,6 +73,7 @@ RESTRICT="test"
 
 PATCHES=(
 	"${FILESDIR}/bash-completion-sudo.patch"
+	"${FILESDIR}/0.8.2-ZPOOL_IMPORT_UDEV_TIMEOUT_MS.patch" # https://github.com/zfsonlinux/zfs/pull/9109
 )
 
 pkg_setup() {
@@ -97,12 +101,9 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	if [[ ${PV} == *"9999" ]]; then
-		eautoreconf
-	else
-		# Set revision number
-		sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
-	fi
+	eautoreconf
+	# Set revision number
+	sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
 
 	if use python; then
 		pushd contrib/pyzfs >/dev/null || die
@@ -194,7 +195,7 @@ pkg_postinst() {
 		fi
 	fi
 
-	if ! use kernel-builtin && [[ ${PV} == *"9999" ]]; then
+	if ! use kernel-builtin && [[ ${PV} = "9999" ]]; then
 		einfo "Adding ${P} to the module database to ensure that the"
 		einfo "kernel modules and userland utilities stay in sync."
 		update_moduledb
@@ -211,7 +212,7 @@ pkg_postinst() {
 }
 
 pkg_postrm() {
-	if ! use kernel-builtin && [[ ${PV} == *"9999" ]]; then
+	if ! use kernel-builtin && [[ ${PV} == "9999" ]]; then
 		remove_moduledb
 	fi
 }

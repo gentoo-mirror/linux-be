@@ -1,22 +1,18 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-inherit flag-o-matic linux-mod toolchain-funcs
+inherit flag-o-matic linux-info linux-mod toolchain-funcs
 
 DESCRIPTION="Linux ZFS kernel module for sys-fs/zfs"
 HOMEPAGE="https://zfsonlinux.org/"
 
-if [[ ${PV} == *"9999" ]]; then
-	inherit autotools git-r3
-	EGIT_REPO_URI="https://gitlab.com/linux-be/zfs.git"
-else
-	SRC_URI="https://github.com/zfsonlinux/zfs/releases/download/zfs-${PV}/zfs-${PV}.tar.gz"
-	KEYWORDS="~amd64 ~arm64 ~ppc64"
-	S="${WORKDIR}/zfs-${PV}"
-	ZFS_KERNEL_COMPAT="5.4"
-fi
+inherit autotools git-r3
+EGIT_REPO_URI="https://gitlab.com/linux-be/zfs.git"
+EGIT_COMMIT="zfs-${PV}-beadm"
+KEYWORDS="~amd64 ~arm64 ~ppc64"
+ZFS_KERNEL_COMPAT="5.4"
 
 LICENSE="CDDL debug? ( GPL-2+ )"
 SLOT="0/libbe"
@@ -25,6 +21,7 @@ IUSE="custom-cflags debug +rootfs"
 DEPEND=""
 
 RDEPEND="${DEPEND}
+	!sys-fs/zfs-fuse
 	!sys-kernel/spl
 "
 
@@ -37,7 +34,11 @@ RESTRICT="debug? ( strip ) test"
 
 DOCS=( AUTHORS COPYRIGHT META README.md )
 
+PATCHES=( "${FILESDIR}/${PV}-umask_O_TMPFILE.patch" )
+
 pkg_setup() {
+	linux-info_pkg_setup
+
 	CONFIG_CHECK="
 		!DEBUG_LOCK_ALLOC
 		EFI_PARTITION
@@ -68,7 +69,7 @@ pkg_setup() {
 
 	kernel_is -ge 2 6 32 || die "Linux 2.6.32 or newer required"
 
-	if [[ ${PV} != *"9999" ]]; then
+	if [[ ${PV} != "9999" ]]; then
 		local kv_major_max kv_minor_max zcompat
 		zcompat="${ZFS_KERNEL_COMPAT_OVERRIDE:-${ZFS_KERNEL_COMPAT}}"
 		kv_major_max="${zcompat%%.*}"
@@ -78,18 +79,18 @@ pkg_setup() {
 			"Linux ${kv_major_max}.${kv_minor_max} is the latest supported version"
 	fi
 
-	linux-mod_pkg_setup
+	check_extra_config
 }
 
 src_prepare() {
 	default
 
-	if [[ ${PV} == *"9999" ]]; then
-		eautoreconf
-	else
-		# Set module revision number
-		sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
-	fi
+	eautoreconf
+	# Set module revision number
+	sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
+
+	# Remove GPLv2-licensed ZPIOS unless we are debugging
+	use debug || sed -e 's/^subdir-m += zpios$//' -i module/Makefile.in
 }
 
 src_configure() {

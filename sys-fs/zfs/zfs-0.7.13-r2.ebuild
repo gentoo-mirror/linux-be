@@ -4,14 +4,13 @@
 EAPI="5"
 PYTHON_COMPAT=( python{2_7,3_6} )
 
-if [[ ${PV} == *"9999" ]] ; then
+if [ ${PV} == "9999" ] ; then
 	inherit git-r3 linux-mod
 	AUTOTOOLS_AUTORECONF="1"
-	EGIT_REPO_URI="https://gitlab.com/linux-be/${PN}.git"
-	EGIT_BRANCH="zfs-0.7-beadm"
+	EGIT_REPO_URI="git://github.com/zfsonlinux/${PN}.git"
 else
 	SRC_URI="https://github.com/zfsonlinux/${PN}/releases/download/${P}/${P}.tar.gz"
-	KEYWORDS="~amd64 ~arm ~ppc ~ppc64"
+	KEYWORDS=""
 fi
 
 inherit autotools-utils bash-completion-r1 flag-o-matic linux-info python-single-r1 systemd toolchain-funcs udev usr-ldscript
@@ -20,7 +19,7 @@ DESCRIPTION="Userland utilities for ZFS Linux kernel module"
 HOMEPAGE="https://zfsonlinux.org/"
 
 LICENSE="BSD-2 CDDL MIT"
-SLOT="0/libbe"
+SLOT="0"
 IUSE="custom-cflags debug kernel-builtin +rootfs systemd test-suite static-libs"
 RESTRICT="test"
 
@@ -37,7 +36,7 @@ DEPEND="${COMMON_DEPEND}
 RDEPEND="${COMMON_DEPEND}
 	${PYTHON_DEPS}
 	!=sys-apps/grep-2.13*
-	!kernel-builtin? ( =sys-fs/zfs-kmod-${PV}*:0/libbe )
+	!kernel-builtin? ( =sys-fs/zfs-kmod-${PV}* )
 	!sys-fs/zfs-fuse
 	!prefix? ( virtual/udev )
 	test-suite? (
@@ -65,6 +64,8 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 AT_M4DIR="config"
 AUTOTOOLS_IN_SOURCE_BUILD="1"
+
+PATCHES=( "${FILESDIR}/0.7.13-ZPOOL_IMPORT_UDEV_TIMEOUT_MS.patch" )
 
 pkg_setup() {
 	python-single-r1_pkg_setup
@@ -144,7 +145,7 @@ src_install() {
 }
 
 pkg_postinst() {
-	if ! use kernel-builtin && [[ ${PV} = *"9999" ]]
+	if ! use kernel-builtin && [ ${PV} = "9999" ]
 	then
 		einfo "Adding ${P} to the module database to ensure that the"
 		einfo "kernel modules and userland utilities stay in sync."
@@ -212,7 +213,7 @@ pkg_postinst() {
 }
 
 pkg_postrm() {
-	if ! use kernel-builtin && [[ ${PV} = *"9999" ]]
+	if ! use kernel-builtin && [ ${PV} = "9999" ]
 	then
 		remove_moduledb
 	fi

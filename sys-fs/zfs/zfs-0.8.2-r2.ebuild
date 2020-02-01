@@ -43,7 +43,7 @@ BDEPEND="virtual/awk
 
 RDEPEND="${DEPEND}
 	!=sys-apps/grep-2.13*
-	!kernel-builtin? ( ~sys-fs/zfs-kmod-${PV} )
+	!kernel-builtin? ( ~sys-fs/zfs-kmod-${PV}:0/libbe )
 	!sys-fs/zfs-fuse
 	!prefix? ( virtual/udev )
 	sys-fs/udev-init-scripts

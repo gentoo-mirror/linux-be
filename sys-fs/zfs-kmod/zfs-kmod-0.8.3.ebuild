@@ -15,7 +15,7 @@ KEYWORDS="~amd64 ~arm64 ~ppc64"
 ZFS_KERNEL_COMPAT="5.4"
 
 LICENSE="CDDL debug? ( GPL-2+ )"
-SLOT="0"
+SLOT="0/libbe"
 IUSE="custom-cflags debug +rootfs"
 
 DEPEND=""
@@ -80,12 +80,9 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	if [[ ${PV} == "9999" ]]; then
-		eautoreconf
-	else
-		# Set module revision number
-		sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
-	fi
+	eautoreconf
+	# Set module revision number
+	sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
 }
 
 src_configure() {

@@ -17,7 +17,7 @@ EGIT_COMMIT="zfs-${PV}-beadm"
 KEYWORDS="~amd64 ~arm64 ~ppc64"
 
 LICENSE="BSD-2 CDDL MIT"
-SLOT="0"
+SLOT="0/libbe"
 IUSE="custom-cflags debug kernel-builtin libressl python +rootfs test-suite static-libs"
 
 DEPEND="
@@ -92,12 +92,9 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	if [[ ${PV} == "9999" ]]; then
-		eautoreconf
-	else
-		# Set revision number
-		sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
-	fi
+	eautoreconf
+	# Set revision number
+	sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
 
 	if use python; then
 		pushd contrib/pyzfs >/dev/null || die

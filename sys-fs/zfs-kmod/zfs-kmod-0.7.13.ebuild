@@ -4,7 +4,7 @@
 EAPI="5"
 
 AUTOTOOLS_AUTORECONF="1"
-EGIT_REPO_URI="https://github.com/zfsonlinux/zfs.git"
+EGIT_REPO_URI="https://gitlab.com/linux-be/zfs.git"
 EGIT_COMMIT="zfs-${PV}-beadm"
 inherit git-r3
 KEYWORDS="amd64"

@@ -19,6 +19,13 @@ verify-repo:
   script:
     - repoman --mode scan -xq || exit 0
 
+verify-linux-be-changes:
+  image:
+    name: bitnami/minideb
+  stage: verify
+  script:
+    - ./sanity.sh
+
 check-fetch:
   image: $CONTAINER_TEST_IMAGE
   stage: test

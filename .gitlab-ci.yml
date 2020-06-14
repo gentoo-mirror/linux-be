@@ -13,7 +13,7 @@ build-image:
 
 verify-repo:
   image:
-    name: chaoslab/repoman
+    name: aegypius/repoman
     entrypoint: [""]
   stage: verify
   script:

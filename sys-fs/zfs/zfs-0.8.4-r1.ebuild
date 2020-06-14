@@ -4,20 +4,23 @@
 EAPI=7
 
 DISTUTILS_OPTIONAL=1
-PYTHON_COMPAT=( python{2_7,3_{6,7}} )
+PYTHON_COMPAT=( python3_{6,7} )
 
-inherit bash-completion-r1 flag-o-matic linux-info linux-mod distutils-r1 systemd toolchain-funcs udev usr-ldscript
+inherit autotools bash-completion-r1 flag-o-matic linux-info distutils-r1 systemd toolchain-funcs udev usr-ldscript
 
 DESCRIPTION="Userland utilities for ZFS Linux kernel module"
-HOMEPAGE="https://zfsonlinux.org/"
+HOMEPAGE="https://github.com/openzfs/zfs"
 
-inherit autotools git-r3
-EGIT_REPO_URI="https://gitlab.com/linux-be/${PN}.git"
-EGIT_COMMIT="zfs-${PV}-beadm"
-KEYWORDS="~amd64 ~arm64 ~ppc64"
+if [[ ${PV} == "9999" ]] ; then
+	inherit git-r3 linux-mod
+	EGIT_REPO_URI="https://github.com/openzfs/zfs.git"
+else
+	SRC_URI="https://github.com/openzfs/${PN}/releases/download/${P}/${P}.tar.gz"
+	KEYWORDS="amd64 ~arm64 ~ppc64"
+fi
 
 LICENSE="BSD-2 CDDL MIT"
-SLOT="0/libbe"
+SLOT="0"
 IUSE="custom-cflags debug kernel-builtin libressl python +rootfs test-suite static-libs"
 
 DEPEND="
@@ -42,19 +45,13 @@ BDEPEND="virtual/awk
 "
 
 RDEPEND="${DEPEND}
-	!=sys-apps/grep-2.13*
-	!kernel-builtin? ( ~sys-fs/zfs-kmod-${PV}:0/libbe )
-	!sys-fs/zfs-fuse
+	!kernel-builtin? ( ~sys-fs/zfs-kmod-${PV} )
 	!prefix? ( virtual/udev )
 	sys-fs/udev-init-scripts
 	rootfs? (
 		app-arch/cpio
 		app-misc/pax-utils
-		!<sys-boot/grub-2.00-r2:2
 		!<sys-kernel/genkernel-3.5.1.1
-		!<sys-kernel/genkernel-next-67
-		!<sys-kernel/bliss-initramfs-7.1.0
-		!<sys-kernel/dracut-044-r1
 	)
 	test-suite? (
 		sys-apps/util-linux
@@ -73,7 +70,7 @@ RESTRICT="test"
 
 PATCHES=(
 	"${FILESDIR}/bash-completion-sudo.patch"
-	"${FILESDIR}/0.8.2-ZPOOL_IMPORT_UDEV_TIMEOUT_MS.patch" # https://github.com/zfsonlinux/zfs/pull/9109
+	"${FILESDIR}/${PV}-initconfdir.patch"
 )
 
 pkg_setup() {
@@ -101,9 +98,12 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	eautoreconf
-	# Set revision number
-	sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
+	if [[ ${PV} == "9999" ]]; then
+		eautoreconf
+	else
+		# Set revision number
+		sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
+	fi
 
 	if use python; then
 		pushd contrib/pyzfs >/dev/null || die
@@ -113,7 +113,7 @@ src_prepare() {
 
 	# prevent errors showing up on zfs-mount stop, #647688
 	# openrc will unmount all filesystems anyway.
-	sed -i "/^ZFS_UNMOUNT=/ s/yes/no/" etc/init.d/zfs.in || die
+	sed -i "/^ZFS_UNMOUNT=/ s/yes/no/" "etc/default/zfs.in" || die
 }
 
 src_configure() {
@@ -186,12 +186,6 @@ pkg_postinst() {
 			elog "the following packages known to provide one and tested on regular basis:"
 			elog "  sys-kernel/dracut"
 			elog "  sys-kernel/genkernel"
-		fi
-
-		if has_version "<=sys-kernel/genkernel-3.5.3.3"; then
-			einfo "genkernel version 3.5.3.3 and earlier does NOT support"
-			einfo " unlocking pools with native zfs encryption enabled at boot"
-			einfo " use dracut or >=genkernel-4 if you requre this functionality"
 		fi
 	fi
 

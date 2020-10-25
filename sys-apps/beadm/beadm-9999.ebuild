@@ -19,7 +19,9 @@ DEPEND="sys-fs/zfs[test-suite?]
 	sys-apps/util-linux
 "
 
-RDEPEND="${DEPEND}"
+RDEPEND="${DEPEND}
+	!sys-fs/zfs:0/libbe
+"
 
 RESTRICT="test"
 

@@ -53,7 +53,7 @@ check_stable_doing_git() {
     double_indent=$'\t\t'
     for i in $(ls -1 sys-fs/zfs*/zfs*.ebuild | grep -v 9999); do
 	grep -q "^inherit .*git" "${i}"; assert_true "${i} does not inherit autotools unconditionally"
-	grep -q "^EGIT_REPO_URI" "${i}"; assert_true "{i} does not set EGIT_REPO_URI unconditionally"
+	grep -q "^EGIT_REPO_URI" "${i}"; assert_true "${i} does not set EGIT_REPO_URI unconditionally"
 
 	grep -q "^inherit .*autotools" "${i}"; assert_true "${i} does not inherit autotools unconditionally"
 	grep -Hn "eautoreconf" "${i}" | grep "${double_indent}"; assert_false "${i} does not run eautoreconf unconditionally"

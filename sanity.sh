@@ -79,7 +79,7 @@ check_zfs_useflags() {
 
 check_live_with_no_stable_patches() {
     for i in */*/*9999*.ebuild; do
-	grep -Hn -E "(PV|[0-9]+.[0-9]+.[0-9]+).*\.patch" "${i}"; assert_false "${i} live ebuild uses a patch for a patch release"
+	grep -Hn -E "(PV|[0-9]+.[0-9]+.[0-9]+).*\.patch" "${i}"; assert_false "${i} live ebuild uses a patch from a stable release"
     done
 }
 

@@ -17,7 +17,7 @@ EGIT_COMMIT="zfs-${PV}-beadm"
 KEYWORDS="~amd64 ~arm64 ~ppc64"
 
 LICENSE="BSD-2 CDDL MIT"
-SLOT="0/2" # just libzfs soname major for now. possible candidates: libuutil, libzpool, libnvpair
+SLOT="0/libbe" # actually 0/2 # just libzfs soname major for now. possible candidates: libuutil, libzpool, libnvpair
 IUSE="custom-cflags debug kernel-builtin libressl minimal nls python +rootfs test-suite static-libs"
 
 DEPEND="
@@ -43,7 +43,7 @@ BDEPEND="virtual/awk
 "
 
 RDEPEND="${DEPEND}
-	!kernel-builtin? ( ~sys-fs/zfs-kmod-${PV} )
+	!kernel-builtin? ( ~sys-fs/zfs-kmod-${PV}:0/libbe )
 	!prefix? ( virtual/udev )
 	sys-fs/udev-init-scripts
 	rootfs? (

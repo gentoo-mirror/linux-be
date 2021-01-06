@@ -98,7 +98,7 @@ DEPEND="
 		sdl? ( media-libs/libsdl )
 	)
 	device-mapper? ( >=sys-fs/lvm2-2.02.45 )
-	libzfs? ( sys-fs/zfs:0/libbe ) # should be sys-fs/zfs:=
+	libzfs? ( sys-fs/zfs:0/libbe )
 	mount? ( sys-fs/fuse:0 )
 	truetype? ( media-libs/freetype:2= )
 	ppc? ( >=sys-apps/ibm-powerpc-utils-1.3.5 )

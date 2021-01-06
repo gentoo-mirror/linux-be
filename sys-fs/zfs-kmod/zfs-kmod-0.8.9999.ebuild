@@ -19,7 +19,7 @@ else
 	ZFS_KERNEL_COMPAT="5.10"
 fi
 
-LICENSE="CDDL MIT debug? ( GPL-2+ )"
+LICENSE="CDDL debug? ( GPL-2+ )"
 SLOT="0/libbe"
 IUSE="custom-cflags debug +rootfs"
 
@@ -61,6 +61,10 @@ pkg_setup() {
 			DEVTMPFS
 	"
 
+	if use arm64; then
+		kernel_is -ge 5 && CONFIG_CHECK="${CONFIG_CHECK} !PREEMPT"
+	fi
+
 	kernel_is -lt 5 && CONFIG_CHECK="${CONFIG_CHECK} IOSCHED_NOOP"
 
 	if [[ ${PV} != *"9999" ]]; then
@@ -74,7 +78,8 @@ pkg_setup() {
 
 	fi
 
-	kernel_is -ge 3 10 || die "Linux 3.10 or newer required"
+	# 0.8.x requires at least 2.6.32
+	kernel_is ge 2 6 32 || die "Linux 2.6.32 or newer required"
 
 	linux-mod_pkg_setup
 }
@@ -108,7 +113,7 @@ src_configure() {
 		$(use_enable debug)
 	)
 
-	econf "${myconf[@]}"
+	CONFIG_SHELL="${EPREFIX}/bin/bash" econf "${myconf[@]}"
 }
 
 src_compile() {

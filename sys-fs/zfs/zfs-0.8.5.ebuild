@@ -4,24 +4,26 @@
 EAPI=7
 
 DISTUTILS_OPTIONAL=1
-PYTHON_COMPAT=( python3_{6,7} )
+PYTHON_COMPAT=( python3_{6,7,8} )
 
 inherit autotools bash-completion-r1 flag-o-matic linux-info distutils-r1 systemd toolchain-funcs udev usr-ldscript
 
 DESCRIPTION="Userland utilities for ZFS Linux kernel module"
 HOMEPAGE="https://github.com/openzfs/zfs"
 
-inherit git-r3
-EGIT_REPO_URI="https://gitlab.com/linux-be/${PN}.git"
-EGIT_COMMIT="zfs-${PV}-beadm"
-KEYWORDS="amd64 ~arm64 ~ppc64"
+if [[ ${PV} == "9999" ]] ; then
+	inherit git-r3 linux-mod
+	EGIT_REPO_URI="https://github.com/openzfs/zfs.git"
+else
+	SRC_URI="https://github.com/openzfs/${PN}/releases/download/${P}/${P}.tar.gz"
+	KEYWORDS="amd64 arm64 ppc64"
+fi
 
 LICENSE="BSD-2 CDDL MIT"
-SLOT="0/libbe"
-IUSE="custom-cflags debug kernel-builtin libressl python +rootfs test-suite static-libs"
+SLOT="0/2" # just libzfs soname major for now. possible candidates: libuutil, libzpool, libnvpair
+IUSE="custom-cflags debug kernel-builtin libressl minimal nls python +rootfs test-suite static-libs"
 
 DEPEND="
-	${PYTHON_DEPS}
 	net-libs/libtirpc[static-libs?]
 	sys-apps/util-linux[static-libs?]
 	sys-libs/zlib[static-libs(+)?]
@@ -29,6 +31,7 @@ DEPEND="
 	virtual/libudev[static-libs(-)?]
 	libressl? ( dev-libs/libressl:0=[static-libs?] )
 	!libressl? ( dev-libs/openssl:0=[static-libs?] )
+	!minimal? ( ${PYTHON_DEPS} )
 	python? (
 		virtual/python-cffi[${PYTHON_USEDEP}]
 	)
@@ -36,13 +39,14 @@ DEPEND="
 
 BDEPEND="virtual/awk
 	virtual/pkgconfig
+	nls? ( sys-devel/gettext )
 	python? (
 		dev-python/setuptools[${PYTHON_USEDEP}]
 	)
 "
 
 RDEPEND="${DEPEND}
-	!kernel-builtin? ( ~sys-fs/zfs-kmod-${PV}:0/libbe )
+	!kernel-builtin? ( ~sys-fs/zfs-kmod-${PV} )
 	!prefix? ( virtual/udev )
 	sys-fs/udev-init-scripts
 	rootfs? (
@@ -51,23 +55,26 @@ RDEPEND="${DEPEND}
 		!<sys-kernel/genkernel-3.5.1.1
 	)
 	test-suite? (
+		sys-apps/kmod[tools]
 		sys-apps/util-linux
 		sys-devel/bc
 		sys-block/parted
 		sys-fs/lsscsi
 		sys-fs/mdadm
 		sys-process/procps
-		virtual/modutils
 	)
 "
 
-REQUIRED_USE="${PYTHON_REQUIRED_USE}"
+REQUIRED_USE="
+	!minimal? ( ${PYTHON_REQUIRED_USE} )
+	python? ( !minimal )
+	test-suite? ( !minimal )
+"
 
 RESTRICT="test"
 
 PATCHES=(
 	"${FILESDIR}/bash-completion-sudo.patch"
-	"${FILESDIR}/${PV}-initconfdir.patch"
 )
 
 pkg_setup() {
@@ -95,9 +102,12 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	eautoreconf
-	# Set revision number
-	sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
+	if [[ ${PV} == "9999" ]]; then
+		eautoreconf
+	else
+		# Set revision number
+		sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
+	fi
 
 	if use python; then
 		pushd contrib/pyzfs >/dev/null || die
@@ -112,7 +122,7 @@ src_prepare() {
 
 src_configure() {
 	use custom-cflags || strip-flags
-	python_setup
+	use minimal || python_setup
 
 	local myconf=(
 		--bindir="${EPREFIX}/bin"
@@ -126,15 +136,16 @@ src_configure() {
 		--with-linux="${KV_DIR}"
 		--with-linux-obj="${KV_OUT_DIR}"
 		--with-udevdir="$(get_udevdir)"
-		--with-python="${EPYTHON}"
 		--with-systemdunitdir="$(systemd_get_systemunitdir)"
 		--with-systemdpresetdir="${EPREFIX}/lib/systemd/system-preset"
 		$(use_enable debug)
+		$(use_enable nls)
 		$(use_enable python pyzfs)
 		$(use_enable static-libs static)
+		$(usex minimal --without-python --with-python="${EPYTHON}")
 	)
 
-	econf "${myconf[@]}"
+	CONFIG_SHELL="${EPREFIX}/bin/bash" econf "${myconf[@]}"
 }
 
 src_compile() {
@@ -170,7 +181,7 @@ src_install() {
 	fi
 
 	# enforce best available python implementation
-	python_fix_shebang "${ED}/bin"
+	use minimal || python_fix_shebang "${ED}/bin"
 }
 
 pkg_postinst() {
@@ -189,14 +200,19 @@ pkg_postinst() {
 		update_moduledb
 	fi
 
-	[[ -e "${EROOT}/etc/runlevels/boot/zfs-import" ]] || \
-		einfo "You should add zfs-import to the boot runlevel."
-	[[ -e "${EROOT}/etc/runlevels/boot/zfs-mount" ]]|| \
-		einfo "You should add zfs-mount to the boot runlevel."
-	[[ -e "${EROOT}/etc/runlevels/default/zfs-share" ]] || \
-		einfo "You should add zfs-share to the default runlevel."
-	[[ -e "${EROOT}/etc/runlevels/default/zfs-zed" ]] || \
-		einfo "You should add zfs-zed to the default runlevel."
+	if systemd_is_booted || has_version sys-apps/systemd; then
+		einfo "Please refer to ${EROOT}/lib/systemd/system-preset/50-zfs.preset"
+		einfo "for default zfs systemd service configuration"
+	else
+		[[ -e "${EROOT}/etc/runlevels/boot/zfs-import" ]] || \
+			einfo "You should add zfs-import to the boot runlevel."
+		[[ -e "${EROOT}/etc/runlevels/boot/zfs-mount" ]]|| \
+			einfo "You should add zfs-mount to the boot runlevel."
+		[[ -e "${EROOT}/etc/runlevels/default/zfs-share" ]] || \
+			einfo "You should add zfs-share to the default runlevel."
+		[[ -e "${EROOT}/etc/runlevels/default/zfs-zed" ]] || \
+			einfo "You should add zfs-zed to the default runlevel."
+	fi
 }
 
 pkg_postrm() {

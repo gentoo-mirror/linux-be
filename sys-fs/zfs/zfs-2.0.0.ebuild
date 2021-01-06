@@ -11,9 +11,9 @@ inherit autotools bash-completion-r1 distutils-r1 flag-o-matic linux-info pam sy
 DESCRIPTION="Userland utilities for ZFS Linux kernel module"
 HOMEPAGE="https://github.com/openzfs/zfs"
 
-if [[ ${PV} == *"9999" ]] ; then
+if [[ ${PV} == "9999" ]] ; then
 	inherit git-r3 linux-mod
-	EGIT_REPO_URI="https://gitlab.com/linux-be/${PN}.git"
+	EGIT_REPO_URI="https://github.com/openzfs/zfs.git"
 else
 	MY_P="${P/_rc/-rc}"
 	SRC_URI="https://github.com/openzfs/${PN}/releases/download/${MY_P}/${MY_P}.tar.gz"
@@ -22,7 +22,9 @@ else
 fi
 
 LICENSE="BSD-2 CDDL MIT"
-SLOT="0/libbe" # actually 0/4
+# just libzfs soname major for now.
+# possible candidates: libuutil, libzpool, libnvpair. Those do not provide stable abi, but are considered.
+SLOT="0/4"
 IUSE="custom-cflags debug kernel-builtin libressl minimal nls pam python +rootfs test-suite static-libs"
 
 DEPEND="
@@ -30,7 +32,7 @@ DEPEND="
 	sys-apps/util-linux[static-libs?]
 	sys-libs/zlib[static-libs(+)?]
 	virtual/awk
-	virtual/libudev[static-libs?]
+	virtual/libudev[static-libs(-)?]
 	libressl? ( dev-libs/libressl:0=[static-libs?] )
 	!libressl? ( dev-libs/openssl:0=[static-libs?] )
 	!minimal? ( ${PYTHON_DEPS} )
@@ -49,7 +51,7 @@ BDEPEND="virtual/awk
 "
 
 RDEPEND="${DEPEND}
-	!kernel-builtin? ( ~sys-fs/zfs-kmod-${PV}:0/libbe )
+	!kernel-builtin? ( ~sys-fs/zfs-kmod-${PV} )
 	!prefix? ( virtual/udev )
 	sys-fs/udev-init-scripts
 	rootfs? (
@@ -76,9 +78,7 @@ REQUIRED_USE="
 
 RESTRICT="test"
 
-PATCHES=(
-	"${FILESDIR}/bash-completion-sudo.patch"
-)
+PATCHES=( "${FILESDIR}/bash-completion-sudo.patch" )
 
 pkg_setup() {
 	if use kernel_linux && use test-suite; then
@@ -105,7 +105,7 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	if [[ ${PV} == *"9999" ]]; then
+	if [[ ${PV} == "9999" ]]; then
 		eautoreconf
 	else
 		# Set revision number
@@ -203,7 +203,7 @@ pkg_postinst() {
 		fi
 	fi
 
-	if ! use kernel-builtin && [[ ${PV} == *"9999" ]]; then
+	if ! use kernel-builtin && [[ ${PV} = "9999" ]]; then
 		einfo "Adding ${P} to the module database to ensure that the"
 		einfo "kernel modules and userland utilities stay in sync."
 		update_moduledb
@@ -225,7 +225,7 @@ pkg_postinst() {
 }
 
 pkg_postrm() {
-	if ! use kernel-builtin && [[ ${PV} == *"9999" ]]; then
+	if ! use kernel-builtin && [[ ${PV} == "9999" ]]; then
 		remove_moduledb
 	fi
 }

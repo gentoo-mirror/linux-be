@@ -8,14 +8,19 @@ inherit autotools flag-o-matic linux-mod toolchain-funcs
 DESCRIPTION="Linux ZFS kernel module for sys-fs/zfs"
 HOMEPAGE="https://github.com/openzfs/zfs"
 
-inherit git-r3
-EGIT_REPO_URI="https://gitlab.com/linux-be/zfs.git"
-EGIT_COMMIT="zfs-${PV}-beadm"
-KEYWORDS="amd64 ~arm64 ~ppc64"
-ZFS_KERNEL_COMPAT="5.6"
+if [[ ${PV} == "9999" ]]; then
+	inherit git-r3
+	EGIT_REPO_URI="https://github.com/openzfs/zfs.git"
+else
+	MY_PV="${PV/_rc/-rc}"
+	SRC_URI="https://github.com/openzfs/zfs/releases/download/zfs-${MY_PV}/zfs-${MY_PV}.tar.gz"
+	KEYWORDS="~amd64 ~arm64 ~ppc64"
+	S="${WORKDIR}/zfs-${PV%_rc?}"
+	ZFS_KERNEL_COMPAT="5.9"
+fi
 
-LICENSE="CDDL debug? ( GPL-2+ )"
-SLOT="0/libbe"
+LICENSE="CDDL MIT debug? ( GPL-2+ )"
+SLOT="0"
 IUSE="custom-cflags debug +rootfs"
 
 DEPEND=""
@@ -56,10 +61,6 @@ pkg_setup() {
 			DEVTMPFS
 	"
 
-	if use arm64; then
-		kernel_is -ge 5 && CONFIG_CHECK="${CONFIG_CHECK} !PREEMPT"
-	fi
-
 	kernel_is -lt 5 && CONFIG_CHECK="${CONFIG_CHECK} IOSCHED_NOOP"
 
 	if [[ ${PV} != "9999" ]]; then
@@ -71,12 +72,9 @@ pkg_setup() {
 		kernel_is -le "${kv_major_max}" "${kv_minor_max}" || die \
 			"Linux ${kv_major_max}.${kv_minor_max} is the latest supported version"
 
-		# 0.8.x requires at least 2.6.32
-		kernel_is ge 2 6 32 || die "Linux 2.6.32 or newer required"
-	else
-		# git master requires at least 3.10
-		kernel_is -ge 3 10 || die "Linux 3.10 or newer required"
 	fi
+
+	kernel_is -ge 3 10 || die "Linux 3.10 or newer required"
 
 	linux-mod_pkg_setup
 }
@@ -84,9 +82,12 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	eautoreconf
-	# Set module revision number
-	sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
+	if [[ ${PV} == "9999" ]]; then
+		eautoreconf
+	else
+		# Set module revision number
+		sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
+	fi
 }
 
 src_configure() {
@@ -97,6 +98,8 @@ src_configure() {
 	filter-ldflags -Wl,*
 
 	local myconf=(
+		CROSS_COMPILE="${CHOST}-"
+		HOSTCC="$(tc-getBUILD_CC)"
 		--bindir="${EPREFIX}/bin"
 		--sbindir="${EPREFIX}/sbin"
 		--with-config=kernel
@@ -111,7 +114,11 @@ src_configure() {
 src_compile() {
 	set_arch_to_kernel
 
-	myemakeargs=( V=1 )
+	myemakeargs=(
+		CROSS_COMPILE="${CHOST}-"
+		HOSTCC="$(tc-getBUILD_CC)"
+		V=1
+	)
 
 	emake "${myemakeargs[@]}"
 }

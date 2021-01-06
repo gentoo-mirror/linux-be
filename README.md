@@ -22,6 +22,11 @@ mkdir -p /etc/portage/package.accept_keywords
 ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be.keywords /etc/portage/package.accept_keywords/
 ```
 
+To use the stand-alone `beadm` ebuild (for any version of ZFS):
+```
+ln -s "$installed_overlay"/Documentation/package.accept_keywords/beadm.keywords /etc/portage/package.accept_keywords/
+```
+
 To use the releases of `zfs` with `beadm` based on ZFSonLinux 0.8.x:
 ```
 ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be-zfs-0.8.keywords /etc/portage/package.accept_keywords/
@@ -29,12 +34,18 @@ ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be-zfs-0.
 
 Live `zfs*` ebuilds are also provided for testing untagged commits.
 
-To use live `zfs*` ebuilds that fetch code from the `master` branch (based on `zfsonlinux/zfs` `zfs-0.8-release` branch):
+To use live `zfs*` ebuilds that fetch code from the `beadm` branch (based on `zfsonlinux/zfs` `zfs-0.8-release` branch):
 ```
 ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be-zfs-0.8.9999.keywords /etc/portage/package.accept_keywords/
 ```
 
 ### Install all the packages
+
+```
+emerge -avt {beadm,grub,genkernel,bemerge}::linux-be
+```
+
+or:
 
 ```
 emerge -avt {zfs{,-kmod},grub,genkernel,bemerge}::linux-be

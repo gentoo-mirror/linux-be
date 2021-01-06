@@ -83,6 +83,12 @@ check_live_with_no_stable_patches() {
     done
 }
 
+check_stable_no_gentoo_release() {
+    for i in $(ls -1 sys-fs/zfs*/zfs*.ebuild | grep -v 9999); do
+	grep -Hn -E "Gentoo release" "${i}"; assert_false "${i} sets Gentoo release"
+    done
+}
+
 
 check_fetching_from_linux_be
 check_stable_fetching_from_tag
@@ -90,6 +96,7 @@ check_live_checking_version
 check_libbe_slot
 check_depend_on_libbe
 check_stable_doing_git
+check_stable_no_gentoo_release
 check_zfs_useflags
 check_live_with_no_stable_patches
 

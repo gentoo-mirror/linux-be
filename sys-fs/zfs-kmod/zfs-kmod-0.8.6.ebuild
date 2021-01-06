@@ -88,8 +88,6 @@ src_prepare() {
 	default
 
 	eautoreconf
-	# Set module revision number
-	sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
 }
 
 src_configure() {

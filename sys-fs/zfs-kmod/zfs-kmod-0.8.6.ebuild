@@ -8,16 +8,11 @@ inherit autotools flag-o-matic linux-mod toolchain-funcs
 DESCRIPTION="Linux ZFS kernel module for sys-fs/zfs"
 HOMEPAGE="https://github.com/openzfs/zfs"
 
-if [[ ${PV} == *"9999" ]]; then
-	inherit git-r3
-	EGIT_REPO_URI="https://gitlab.com/linux-be/zfs.git"
-else
-	MY_PV="${PV/_rc/-rc}"
-	SRC_URI="https://github.com/openzfs/zfs/releases/download/zfs-${MY_PV}/zfs-${MY_PV}.tar.gz"
-	KEYWORDS="~amd64 ~arm64 ~ppc64"
-	S="${WORKDIR}/zfs-${PV%_rc?}"
-	ZFS_KERNEL_COMPAT="5.10"
-fi
+inherit git-r3
+EGIT_REPO_URI="https://gitlab.com/linux-be/zfs.git"
+EGIT_COMMIT="zfs-${PV}-beadm"
+KEYWORDS="~amd64 ~arm64 ~ppc64"
+ZFS_KERNEL_COMPAT="5.9"
 
 LICENSE="CDDL debug? ( GPL-2+ )"
 SLOT="0/libbe"
@@ -37,6 +32,9 @@ BDEPEND="
 RESTRICT="debug? ( strip ) test"
 
 DOCS=( AUTHORS COPYRIGHT META README.md )
+
+# https://github.com/openzfs/zfs/pull/11371
+PATCHES=( "${FILESDIR}/${PV}-copy-builtin.patch" )
 
 pkg_setup() {
 	CONFIG_CHECK="
@@ -67,7 +65,7 @@ pkg_setup() {
 
 	kernel_is -lt 5 && CONFIG_CHECK="${CONFIG_CHECK} IOSCHED_NOOP"
 
-	if [[ ${PV} != *"9999" ]]; then
+	if [[ ${PV} != "9999" ]]; then
 		local kv_major_max kv_minor_max zcompat
 		zcompat="${ZFS_KERNEL_COMPAT_OVERRIDE:-${ZFS_KERNEL_COMPAT}}"
 		kv_major_max="${zcompat%%.*}"
@@ -76,10 +74,12 @@ pkg_setup() {
 		kernel_is -le "${kv_major_max}" "${kv_minor_max}" || die \
 			"Linux ${kv_major_max}.${kv_minor_max} is the latest supported version"
 
+		# 0.8.x requires at least 2.6.32
+		kernel_is ge 2 6 32 || die "Linux 2.6.32 or newer required"
+	else
+		# git master requires at least 3.10
+		kernel_is -ge 3 10 || die "Linux 3.10 or newer required"
 	fi
-
-	# 0.8.x requires at least 2.6.32
-	kernel_is ge 2 6 32 || die "Linux 2.6.32 or newer required"
 
 	linux-mod_pkg_setup
 }
@@ -87,12 +87,7 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	if [[ ${PV} == *"9999" ]]; then
-		eautoreconf
-	else
-		# Set module revision number
-		sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
-	fi
+	eautoreconf
 }
 
 src_configure() {

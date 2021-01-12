@@ -26,7 +26,8 @@ RUN echo "dev-vcs/git -gpg -iconv -nls -pcre-jit -pcre -perl -python -webdav" >>
 RUN echo "sys-kernel/gentoo-sources symlink" >> /etc/portage/package.use/kernel
 
 RUN emerge dev-vcs/git
-RUN emerge -o "sys-kernel/spl"
+
+RUN emerge sys-kernel/gentoo-sources
 
 RUN cd /usr/src/linux && make defconfig
 RUN cd /usr/src/linux && make

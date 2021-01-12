@@ -6,23 +6,18 @@ EAPI=7
 DISTUTILS_OPTIONAL=1
 PYTHON_COMPAT=( python3_{7,8,9} )
 
-inherit autotools bash-completion-r1 distutils-r1 flag-o-matic linux-info systemd toolchain-funcs udev usr-ldscript
+inherit autotools bash-completion-r1 flag-o-matic linux-info distutils-r1 systemd toolchain-funcs udev usr-ldscript
 
 DESCRIPTION="Userland utilities for ZFS Linux kernel module"
 HOMEPAGE="https://github.com/openzfs/zfs"
 
-if [[ ${PV} == *"9999" ]] ; then
-	inherit git-r3 linux-mod
-	EGIT_REPO_URI="https://gitlab.com/linux-be/${PN}.git"
-else
-	MY_P="${P/_rc/-rc}"
-	SRC_URI="https://github.com/openzfs/${PN}/releases/download/${MY_P}/${MY_P}.tar.gz"
-	KEYWORDS="~amd64 ~arm64 ~ppc64"
-	S="${WORKDIR}/${P%_rc?}"
-fi
+inherit git-r3 linux-mod
+EGIT_REPO_URI="https://gitlab.com/linux-be/${PN}.git"
+EGIT_COMMIT="zfs-${PV}-beadm"
+KEYWORDS="~amd64 ~arm64 ~ppc64"
 
 LICENSE="BSD-2 CDDL MIT"
-SLOT="0/libbe" # actually 0/2
+SLOT="0/libbe" # actually 0/2 # just libzfs soname major for now. possible candidates: libuutil, libzpool, libnvpair
 IUSE="custom-cflags debug kernel-builtin libressl minimal nls python +rootfs test-suite static-libs"
 
 DEPEND="
@@ -104,12 +99,7 @@ pkg_setup() {
 src_prepare() {
 	default
 
-	if [[ ${PV} == *"9999" ]]; then
-		eautoreconf
-	else
-		# Set revision number
-		sed -i "s/\(Release:\)\(.*\)1/\1\2${PR}-gentoo/" META || die "Could not set Gentoo release"
-	fi
+	eautoreconf
 
 	if use python; then
 		pushd contrib/pyzfs >/dev/null || die
@@ -196,7 +186,7 @@ pkg_postinst() {
 		fi
 	fi
 
-	if ! use kernel-builtin && [[ ${PV} == *"9999" ]]; then
+	if ! use kernel-builtin && [[ ${PV} = "9999" ]]; then
 		einfo "Adding ${P} to the module database to ensure that the"
 		einfo "kernel modules and userland utilities stay in sync."
 		update_moduledb
@@ -218,7 +208,7 @@ pkg_postinst() {
 }
 
 pkg_postrm() {
-	if ! use kernel-builtin && [[ ${PV} == *"9999" ]]; then
+	if ! use kernel-builtin && [[ ${PV} == "9999" ]]; then
 		remove_moduledb
 	fi
 }

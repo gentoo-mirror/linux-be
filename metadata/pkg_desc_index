@@ -1,3 +1,4 @@
+sys-apps/beadm 9999: A library and a utility for managing Boot Environments
 sys-apps/bemerge 9999: emerge wrapper for boot environments
 sys-boot/grub 9999: GNU GRUB boot loader
 sys-fs/zfs 0.8.6 0.8.9999: Userland utilities for ZFS Linux kernel module

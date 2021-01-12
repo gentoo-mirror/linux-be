@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>vitaut.bayaryn@gmail.com</email>
+		<name>Witaut Bajaryn</name>
+	</maintainer>
+	<upstream>
+		<remote-id type="gitlab">linux-be/zfs</remote-id>
+	</upstream>
+	<use>
+		<flag name="test-suite">Install regression test suite</flag>
+	</use>
+</pkgmetadata>

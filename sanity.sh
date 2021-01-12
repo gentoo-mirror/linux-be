@@ -35,10 +35,17 @@ check_libbe_slot() {
     done
 }
 
-check_depend_on_libbe() {
-    for i in */*/*.ebuild; do
-	grep -Hn sys-fs/zfs "${i}" | grep -v "DESCRIPTION\|zfs-fuse" | grep -v "/libbe"
-	assert_false "${i} depends on non-libbe zfs{,-kmod}"
+check_depend_on_beadm_or_zfs_libbe() {
+    for i in sys-kernel/genkernel/*.ebuild sys-boot/grub/*.ebuild sys-apps/bemerge/*.ebuild; do
+	grep -q sys-apps/beadm "${i}"; assert_true "${i} does not depend on beadm"
+	grep -q sys-fs/zfs:0/libbe "${i}"; assert_true "${i} does not depend on zfs-with-libbe"
+    done
+}
+
+check_depend_on_zfs_kmod_libbe() {
+    for i in $(ls -1 sys-fs/zfs/zfs*.ebuild | grep -v beadm); do
+	grep -Hn sys-fs/zfs-kmod "${i}" | grep -v "/libbe"
+	assert_false "${i} depends on non-libbe zfs-kmod"
     done
 }
 
@@ -46,7 +53,7 @@ check_stable_doing_git() {
     double_indent=$'\t\t'
     for i in $(ls -1 sys-fs/zfs*/zfs*.ebuild | grep -v 9999); do
 	grep -q "^inherit .*git" "${i}"; assert_true "${i} does not inherit autotools unconditionally"
-	grep -q "^EGIT_REPO_URI" "${i}"; assert_true "{i} does not set EGIT_REPO_URI unconditionally"
+	grep -q "^EGIT_REPO_URI" "${i}"; assert_true "${i} does not set EGIT_REPO_URI unconditionally"
 
 	grep -q "^inherit .*autotools" "${i}"; assert_true "${i} does not inherit autotools unconditionally"
 	grep -Hn "eautoreconf" "${i}" | grep "${double_indent}"; assert_false "${i} does not run eautoreconf unconditionally"
@@ -94,7 +101,8 @@ check_fetching_from_linux_be
 check_stable_fetching_from_tag
 check_live_checking_version
 check_libbe_slot
-check_depend_on_libbe
+check_depend_on_beadm_or_zfs_libbe
+check_depend_on_zfs_kmod_libbe
 check_stable_doing_git
 check_stable_no_gentoo_release
 check_zfs_useflags

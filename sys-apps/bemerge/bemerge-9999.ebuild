@@ -13,7 +13,12 @@ SLOT="0"
 KEYWORDS="~amd64"
 IUSE="-doc"
 
-RDEPEND="sys-fs/zfs:0/libbe"
+RDEPEND="
+	|| (
+		sys-apps/beadm
+		sys-fs/zfs:0/libbe
+	)
+"
 DEPEND="${RDEPEND}
 	doc? ( app-doc/doxygen )"
 

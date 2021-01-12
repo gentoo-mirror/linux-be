@@ -27,6 +27,8 @@ RUN echo "sys-kernel/gentoo-sources symlink" >> /etc/portage/package.use/kernel
 
 RUN emerge dev-vcs/git
 
+RUN emerge sys-kernel/gentoo-sources
+
 RUN cd /usr/src/linux && make defconfig
 RUN cd /usr/src/linux && make
 

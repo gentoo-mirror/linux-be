@@ -98,7 +98,7 @@ DEPEND="
 		sdl? ( media-libs/libsdl )
 	)
 	device-mapper? ( >=sys-fs/lvm2-2.02.45 )
-	libzfs? ( sys-fs/zfs:0/libbe )
+	libzfs? ( sys-fs/zfs:= )
 	mount? ( sys-fs/fuse:0 )
 	truetype? ( media-libs/freetype:2= )
 	ppc? ( >=sys-apps/ibm-powerpc-utils-1.3.5 )
@@ -111,6 +111,12 @@ RDEPEND="${DEPEND}
 	)
 	!sys-boot/grub:0 !sys-boot/grub-static
 	nls? ( sys-devel/gettext )
+	libzfs? (
+		|| (
+			sys-apps/beadm
+			sys-fs/zfs:0/libbe
+		)
+	)
 "
 
 RESTRICT="!test? ( test )"

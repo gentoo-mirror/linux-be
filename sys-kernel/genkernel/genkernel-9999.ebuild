@@ -115,7 +115,14 @@ RDEPEND="${DEPEND}
 	sys-devel/libtool
 	virtual/pkgconfig
 	firmware? ( sys-kernel/linux-firmware )
-	zfs? ( sys-fs/zfs:0/libbe )"
+	zfs? (
+		sys-fs/zfs
+		|| (
+			sys-apps/beadm
+			sys-fs/zfs:0/libbe
+		)
+	)
+"
 
 if [[ ${PV} == 9999* ]]; then
 	DEPEND="${DEPEND} app-text/asciidoc"

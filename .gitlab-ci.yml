@@ -13,11 +13,25 @@ build-image:
 
 verify-repo:
   image:
-    name: chaoslab/repoman
+    name: aegypius/repoman
     entrypoint: [""]
   stage: verify
   script:
     - repoman --mode scan -xq || exit 0
+
+verify-linux-be-changes:
+  image:
+    name: bitnami/minideb
+  stage: verify
+  script:
+    - ./sanity.sh
+
+check-fetch:
+  image: $CONTAINER_TEST_IMAGE
+  stage: test
+  script:
+    - for i in "$installed_overlay"/sys-fs/zfs/*.ebuild; do ebuild "$i" unpack; done
+    - for i in "$installed_overlay"/sys-fs/zfs-kmod/*.ebuild; do ebuild "$i" unpack; done
 
 release-image:
   stage: release
@@ -34,4 +48,5 @@ release-image:
 stages:
   - verify
   - build
+  - test
   - release

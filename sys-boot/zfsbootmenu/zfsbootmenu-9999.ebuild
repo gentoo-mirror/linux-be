@@ -25,6 +25,13 @@ RDEPEND="sys-fs/zfs
 	dev-perl/boolean
 "
 
+src_install() {
+	default
+
+	insinto /etc/zfsbootmenu
+	newins "${FILESDIR}"/config.yaml config.yaml
+}
+
 pkg_postinst() {
 	optfeature \
 		"creating a unified EFI executable (which bundles the kernel, initramfs and command line)" \

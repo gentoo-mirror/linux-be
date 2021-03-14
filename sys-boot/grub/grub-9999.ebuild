@@ -9,7 +9,7 @@ if [[ ${PV} == 9999  ]]; then
 fi
 
 if [[ -n ${GRUB_AUTOGEN} || -n ${GRUB_BOOTSTRAP} ]]; then
-	PYTHON_COMPAT=( python{2_7,3_{6,7,8}} )
+	PYTHON_COMPAT=( python{2_7,3_{6,7,8,9}} )
 	inherit python-any-r1
 fi
 
@@ -39,6 +39,7 @@ fi
 PATCHES=(
 	"${FILESDIR}"/gfxpayload.patch
 	"${FILESDIR}"/grub-2.02_beta2-KERNEL_GLOBS.patch
+	"${FILESDIR}"/grub-2.06-test-words.patch
 )
 
 DEJAVU=dejavu-sans-ttf-2.37
@@ -138,14 +139,6 @@ src_prepare() {
 	default
 
 	sed -i -e /autoreconf/d autogen.sh || die
-
-	# Nothing in Gentoo packages 'american-english' in the exact path
-	# wanted for the test, but all that is needed is a compressible text
-	# file, and we do have 'words' from miscfiles in the same path.
-	sed -i \
-		-e '/CFILESSRC.*=/s,american-english,words,' \
-		tests/util/grub-fs-tester.in \
-		|| die
 
 	if [[ -n ${GRUB_AUTOGEN} || -n ${GRUB_BOOTSTRAP} ]]; then
 		python_setup

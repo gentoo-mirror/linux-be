@@ -1,0 +1,4 @@
+sys-boot/zfsbootmenu **
+app-shells/fzf ~amd64
+dev-perl/YAML-PP ~amd64
+sys-boot/systemd-boot ~amd64

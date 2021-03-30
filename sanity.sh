@@ -61,7 +61,7 @@ check_stable_doing_git() {
 }
 
 check_fetching_from_linux_be() {
-    for i in $(ls -1 */*/*.ebuild | grep -v spl); do
+    for i in $(ls -1 */*/*.ebuild | grep -v zfsbootmenu); do
 	grep -Hn 'EGIT_REPO_URI=' "${i}" | grep -v "gitlab.com/linux-be/"; assert_false "${i} uses a non-linux-be git URI"
     done
 }

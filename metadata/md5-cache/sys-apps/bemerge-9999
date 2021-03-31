@@ -3,11 +3,12 @@ DEPEND=|| ( sys-apps/beadm sys-fs/zfs:0/libbe ) doc? ( app-doc/doxygen ) >=dev-v
 DESCRIPTION=emerge wrapper for boot environments
 EAPI=6
 HOMEPAGE=https://gitlab.com/linux-be/bemerge
+INHERIT=git-r3
 IUSE=-doc
 KEYWORDS=~amd64
 LICENSE=GPL-2
 PROPERTIES=live
 RDEPEND=|| ( sys-apps/beadm sys-fs/zfs:0/libbe )
 SLOT=0
-_eclasses_=git-r3	3e7ec3d6619213460c85e2aa48398441
+_eclasses_=git-r3	b8e8c92aa5fe8df7187e466138eb4e52
 _md5_=17c2ee4f51d7568e78f1c9d0e0df74e6

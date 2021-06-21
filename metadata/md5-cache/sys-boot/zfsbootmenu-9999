@@ -8,5 +8,5 @@ LICENSE=MIT
 PROPERTIES=live
 RDEPEND=sys-fs/zfs sys-kernel/dracut app-shells/fzf sys-apps/kexec-tools sys-block/mbuffer dev-perl/Config-IniFiles dev-perl/YAML-PP dev-perl/Sort-Versions dev-perl/boolean
 SLOT=0
-_eclasses_=optfeature	c26721c5e8c4e8bcf168b5e844563321	git-r3	b8e8c92aa5fe8df7187e466138eb4e52
+_eclasses_=optfeature	cc13a38ea4d26565e83ef21d58bcd4ab	git-r3	b8e8c92aa5fe8df7187e466138eb4e52
 _md5_=f5b197354d0c83b6089ceb2f982fa089

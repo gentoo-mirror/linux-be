@@ -15,9 +15,7 @@ RUN mkdir -p /etc/portage/package.use &&\
 
 RUN mkdir -p /etc/portage/package.accept_keywords &&\
     cd /etc/portage/package.accept_keywords &&\
-    ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be.keywords &&\
-    ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be-zfs-master.keywords &&\
-    ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be-zfs-0.7.keywords
+    ln -s "$installed_overlay"/Documentation/package.accept_keywords/linux-be.keywords
 
 
 COPY --from=portage /var/db/repos/gentoo /var/db/repos/gentoo

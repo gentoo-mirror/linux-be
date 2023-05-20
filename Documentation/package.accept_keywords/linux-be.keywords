@@ -1,3 +1,4 @@
+sys-apps/beadm **
 =sys-apps/bemerge-9999 ~amd64
 =sys-kernel/genkernel-9999 **
 =sys-boot/grub-9999 **

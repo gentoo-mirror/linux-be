@@ -1,5 +1,5 @@
 DEFINED_PHASES=compile install postinst unpack
-DEPEND=|| ( sys-apps/beadm sys-fs/zfs:0/libbe ) doc? ( app-doc/doxygen ) >=dev-vcs/git-1.8.2.1[curl]
+DEPEND=sys-fs/zfs:= sys-apps/beadm doc? ( app-doc/doxygen ) >=dev-vcs/git-1.8.2.1[curl]
 DESCRIPTION=emerge wrapper for boot environments
 EAPI=6
 HOMEPAGE=https://gitlab.com/linux-be/bemerge
@@ -8,7 +8,7 @@ IUSE=-doc
 KEYWORDS=~amd64
 LICENSE=GPL-2
 PROPERTIES=live
-RDEPEND=|| ( sys-apps/beadm sys-fs/zfs:0/libbe )
+RDEPEND=sys-fs/zfs:= sys-apps/beadm
 SLOT=0
 _eclasses_=git-r3	27e13c09a4c7e4c78ac812f74727e676
-_md5_=17c2ee4f51d7568e78f1c9d0e0df74e6
+_md5_=10982d37e77046863e932ca7f7eea76f

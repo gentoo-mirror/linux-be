@@ -1,4 +1,4 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -111,12 +111,7 @@ RDEPEND="${DEPEND}
 	)
 	!sys-boot/grub:0 !sys-boot/grub-static
 	nls? ( sys-devel/gettext )
-	libzfs? (
-		|| (
-			sys-apps/beadm
-			sys-fs/zfs:0/libbe
-		)
-	)
+	libzfs? ( sys-apps/beadm )
 "
 
 RESTRICT="!test? ( test )"

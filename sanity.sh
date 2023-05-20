@@ -29,52 +29,15 @@ check_no_tarball() {
     done
 }
 
-check_libbe_slot() {
-    for i in sys-fs/zfs*/zfs*.ebuild; do
-	grep -Hn 'SLOT=' "${i}" | grep -v "/libbe"; assert_false "${i} has a non-libbe SLOT"
-    done
-}
-
-check_depend_on_beadm_or_zfs_libbe() {
+check_depend_on_beadm() {
     for i in sys-kernel/genkernel/*.ebuild sys-boot/grub/*.ebuild sys-apps/bemerge/*.ebuild; do
 	grep -q sys-apps/beadm "${i}"; assert_true "${i} does not depend on beadm"
-	grep -q sys-fs/zfs:0/libbe "${i}"; assert_true "${i} does not depend on zfs-with-libbe"
-    done
-}
-
-check_depend_on_zfs_kmod_libbe() {
-    for i in $(ls -1 sys-fs/zfs/zfs*.ebuild | grep -v beadm); do
-	grep -Hn sys-fs/zfs-kmod "${i}" | grep -v "/libbe"
-	assert_false "${i} depends on non-libbe zfs-kmod"
-    done
-}
-
-check_stable_doing_git() {
-    double_indent=$'\t\t'
-    for i in $(ls -1 sys-fs/zfs*/zfs*.ebuild | grep -v 9999); do
-	grep -q "^inherit .*git" "${i}"; assert_true "${i} does not inherit autotools unconditionally"
-	grep -q "^EGIT_REPO_URI" "${i}"; assert_true "${i} does not set EGIT_REPO_URI unconditionally"
-
-	grep -q "^inherit .*autotools" "${i}"; assert_true "${i} does not inherit autotools unconditionally"
-	grep -Hn "eautoreconf" "${i}" | grep "${double_indent}"; assert_false "${i} does not run eautoreconf unconditionally"
     done
 }
 
 check_fetching_from_linux_be() {
     for i in $(ls -1 */*/*.ebuild | grep -v zfsbootmenu); do
 	grep -Hn 'EGIT_REPO_URI=' "${i}" | grep -v "gitlab.com/linux-be/"; assert_false "${i} uses a non-linux-be git URI"
-    done
-}
-
-check_stable_fetching_from_tag() {
-    for i in $(ls -1 sys-fs/zfs*/zfs*.ebuild | grep -v 9999); do
-	grep -q '^EGIT_COMMIT="zfs-${PV}-beadm"' "${i}"; assert_true "${i} does not fetch from the stable git tag"
-    done
-}
-
-check_live_checking_version() {
-    for i in sys-fs/zfs*/zfs*.9999*.ebuild; do
-	grep -Hn -E "(if|\[).*9999" "${i}" | grep -v '*"9999"'; assert_false "${i} checks for a 9999 version too strictly"
     done
 }
 
@@ -90,25 +53,12 @@ check_live_with_no_stable_patches() {
     done
 }
 
-check_stable_no_gentoo_release() {
-    for i in $(ls -1 sys-fs/zfs*/zfs*.ebuild | grep -v 9999); do
-	grep -Hn -E "Gentoo release" "${i}"; assert_false "${i} sets Gentoo release"
-    done
-}
-
 
 check_fetching_from_linux_be
-check_stable_fetching_from_tag
-check_live_checking_version
-check_libbe_slot
-check_depend_on_beadm_or_zfs_libbe
-check_depend_on_zfs_kmod_libbe
-check_stable_doing_git
-check_stable_no_gentoo_release
+check_depend_on_beadm
 check_zfs_useflags
 check_live_with_no_stable_patches
 
-check_no_tarball zfs sys-fs/zfs*
 check_no_tarball genkernel sys-kernel/genkernel
 check_no_tarball grub sys-boot/grub
 

@@ -1,4 +1,4 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # genkernel-9999        -> latest Git HEAD
@@ -117,10 +117,7 @@ RDEPEND="${DEPEND}
 	firmware? ( sys-kernel/linux-firmware )
 	zfs? (
 		sys-fs/zfs
-		|| (
-			sys-apps/beadm
-			sys-fs/zfs:0/libbe
-		)
+		sys-apps/beadm
 	)
 "
 

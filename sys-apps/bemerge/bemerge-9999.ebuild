@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -14,10 +14,8 @@ KEYWORDS="~amd64"
 IUSE="-doc"
 
 RDEPEND="
-	|| (
-		sys-apps/beadm
-		sys-fs/zfs:0/libbe
-	)
+	sys-fs/zfs:=
+	sys-apps/beadm
 "
 DEPEND="${RDEPEND}
 	doc? ( app-doc/doxygen )"

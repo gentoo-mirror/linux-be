@@ -3,28 +3,42 @@
 
 EAPI=7
 
+# This ebuild uses 3 special global variables:
+# GRUB_BOOTSTRAP: Depend on python and invoke bootstrap (gnulib).
+# GRUB_AUTOGEN: Depend on python and invoke autogen.sh.
+# GRUB_AUTORECONF: Inherit autotools and invoke eautoreconf.
+#
+# When applying patches:
+# If gnulib is updated, set GRUB_BOOTSTRAP=1
+# If gentpl.py or *.def is updated, set GRUB_AUTOGEN=1
+# If gnulib, gentpl.py, *.def, or any autotools files are updated, set GRUB_AUTORECONF=1
+#
+# If any of the above applies to a user patch, the user should set the
+# corresponding variable in make.conf or the environment.
+
 if [[ ${PV} == 9999  ]]; then
 	GRUB_AUTORECONF=1
 	GRUB_BOOTSTRAP=1
 fi
 
+PYTHON_COMPAT=( python3_{9..11} )
+WANT_LIBTOOL=none
+
 if [[ -n ${GRUB_AUTOGEN} || -n ${GRUB_BOOTSTRAP} ]]; then
-	PYTHON_COMPAT=( python3_{9..11} )
 	inherit python-any-r1
 fi
 
 if [[ -n ${GRUB_AUTORECONF} ]]; then
-	WANT_LIBTOOL=none
 	inherit autotools
 fi
 
-inherit bash-completion-r1 flag-o-matic multibuild optfeature pax-utils toolchain-funcs
+inherit bash-completion-r1 flag-o-matic multibuild optfeature toolchain-funcs
 
 if [[ ${PV} != 9999 ]]; then
 	if [[ ${PV} == *_alpha* || ${PV} == *_beta* || ${PV} == *_rc* ]]; then
 		# The quote style is to work with <=bash-4.2 and >=bash-4.3 #503860
 		MY_P=${P/_/'~'}
-		SRC_URI="mirror://gnu-alpha/${PN}/${MY_P}.tar.xz"
+		SRC_URI="https://alpha.gnu.org/gnu/${PN}/${MY_P}.tar.xz"
 		S=${WORKDIR}/${MY_P}
 	else
 		SRC_URI="mirror://gnu/${PN}/${P}.tar.xz"
@@ -38,6 +52,7 @@ fi
 
 PATCHES=(
 	"${FILESDIR}"/gfxpayload.patch
+	"${FILESDIR}"/grub-2.06-test-words.patch
 )
 
 DEJAVU=dejavu-sans-ttf-2.37
@@ -53,7 +68,8 @@ LICENSE="GPL-3+ BSD MIT fonts? ( GPL-2-with-font-exception ) themes? ( CC-BY-SA-
 SLOT="2/${PVR}"
 IUSE="device-mapper doc efiemu +fonts mount nls sdl test +themes truetype libzfs"
 
-GRUB_ALL_PLATFORMS=( coreboot efi-32 efi-64 emu ieee1275 loongson multiboot qemu qemu-mips pc uboot xen xen-32 xen-pvh )
+GRUB_ALL_PLATFORMS=( coreboot efi-32 efi-64 emu ieee1275 loongson multiboot
+	qemu qemu-mips pc uboot xen xen-32 xen-pvh )
 IUSE+=" ${GRUB_ALL_PLATFORMS[@]/#/grub_platforms_}"
 
 REQUIRED_USE="
@@ -65,8 +81,7 @@ REQUIRED_USE="
 
 BDEPEND="
 	${PYTHON_DEPS}
-	app-misc/pax-utils
-	sys-devel/flex
+	>=sys-devel/flex-2.5.35
 	sys-devel/bison
 	sys-apps/help2man
 	sys-apps/texinfo
@@ -109,7 +124,7 @@ RDEPEND="${DEPEND}
 		grub_platforms_efi-32? ( sys-boot/efibootmgr )
 		grub_platforms_efi-64? ( sys-boot/efibootmgr )
 	)
-	!sys-boot/grub:0 !sys-boot/grub-static
+	!sys-boot/grub:0
 	nls? ( sys-devel/gettext )
 	libzfs? ( sys-apps/beadm )
 "
@@ -120,6 +135,10 @@ QA_EXECSTACK="usr/bin/grub-emu* usr/lib/grub/*"
 QA_PRESTRIPPED="usr/lib/grub/.*"
 QA_MULTILIB_PATHS="usr/lib/grub/.*"
 QA_WX_LOAD="usr/lib/grub/*"
+
+pkg_setup() {
+	:
+}
 
 src_unpack() {
 	if [[ ${PV} == 9999 ]]; then
@@ -137,25 +156,17 @@ src_unpack() {
 src_prepare() {
 	default
 
-	sed -i -e /autoreconf/d autogen.sh || die
-
-	# Nothing in Gentoo packages 'american-english' in the exact path
-	# wanted for the test, but all that is needed is a compressible text
-	# file, and we do have 'words' from miscfiles in the same path.
-	sed -i \
-		-e '/CFILESSRC.*=/s,american-english,words,' \
-		tests/util/grub-fs-tester.in \
-		|| die
-
 	if [[ -n ${GRUB_AUTOGEN} || -n ${GRUB_BOOTSTRAP} ]]; then
 		python_setup
+	else
+		export PYTHON=true
 	fi
 
 	if [[ -n ${GRUB_BOOTSTRAP} ]]; then
 		eautopoint --force
 		AUTOPOINT=: AUTORECONF=: ./bootstrap || die
 	elif [[ -n ${GRUB_AUTOGEN} ]]; then
-		./autogen.sh || die
+		FROM_BOOTSTRAP=1 ./autogen.sh || die
 	fi
 
 	if [[ -n ${GRUB_AUTORECONF} ]]; then
@@ -228,6 +239,9 @@ src_configure() {
 	# Bug 508758.
 	replace-flags -O3 -O2
 
+	# Workaround for bug 829165.
+	filter-ldflags -pie
+
 	# We don't want to leak flags onto boot code.
 	export HOST_CCASFLAGS=${CCASFLAGS}
 	export HOST_CFLAGS=${CFLAGS}
@@ -240,7 +254,11 @@ src_configure() {
 	unset LDFLAGS
 
 	tc-export CC NM OBJCOPY RANLIB STRIP
-	tc-export BUILD_CC # Bug 485592
+	tc-export BUILD_CC BUILD_PKG_CONFIG
+
+	# Force configure to use flex & bison, bug 887211.
+	export LEX=flex
+	unset YACC
 
 	MULTIBUILD_VARIANTS=()
 	local p
@@ -272,7 +290,7 @@ src_install() {
 	einstalldocs
 
 	insinto /etc/default
-	newins "${FILESDIR}"/grub.default-3 grub
+	newins "${FILESDIR}"/grub.default-4 grub
 
 	# https://bugs.gentoo.org/231935
 	dostrip -x /usr/lib/grub
@@ -282,16 +300,30 @@ pkg_postinst() {
 	elog "For information on how to configure GRUB2 please refer to the guide:"
 	elog "    https://wiki.gentoo.org/wiki/GRUB2_Quick_Start"
 
+	if [[ -n ${REPLACING_VERSIONS} ]]; then
+		local v
+		for v in ${REPLACING_VERSIONS}; do
+			if ver_test -gt ${v}; then
+				ewarn
+				ewarn "Re-run grub-install to update installed boot code!"
+				ewarn
+				break
+			fi
+		done
+	else
+		elog
+		optfeature "detecting other operating systems (grub-mkconfig)" sys-boot/os-prober
+		optfeature "creating rescue media (grub-mkrescue)" dev-libs/libisoburn
+		optfeature "enabling RAID device detection" sys-fs/mdadm
+	fi
+
 	if has_version 'sys-boot/grub:0'; then
 		elog "A migration guide for GRUB Legacy users is available:"
 		elog "    https://wiki.gentoo.org/wiki/GRUB2_Migration"
 	fi
 
-	if [[ -z ${REPLACING_VERSIONS} ]]; then
-		elog
-		elog "You may consider installing the following optional packages:"
-		optfeature "Detect other operating systems (grub-mkconfig)" sys-boot/os-prober
-		optfeature "Create rescue media (grub-mkrescue)" dev-libs/libisoburn
-		optfeature "Enable RAID device detection" sys-fs/mdadm
+	if has_version sys-boot/os-prober; then
+		ewarn "Due to security concerns, os-prober is disabled by default."
+		ewarn "Set GRUB_DISABLE_OS_PROBER=false in /etc/default/grub to enable it."
 	fi
 }

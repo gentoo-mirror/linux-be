@@ -6,7 +6,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{9..11} )
+PYTHON_COMPAT=( python3_{10..11} )
 
 inherit bash-completion-r1 python-single-r1
 
@@ -32,7 +32,7 @@ VERSION_KMOD="29"
 VERSION_LIBAIO="0.3.112"
 VERSION_LIBGCRYPT="1.9.4"
 VERSION_LIBGPGERROR="1.43"
-VERSION_LIBXCRYPT="4.4.26"
+VERSION_LIBXCRYPT="4.4.36"
 VERSION_LVM="2.02.188"
 VERSION_LZO="2.10"
 VERSION_MDADM="4.1"
@@ -90,7 +90,7 @@ if [[ ${PV} == 9999* ]] ; then
 	S="${WORKDIR}/${P}"
 	SRC_URI="${COMMON_URI}"
 else
-	SRC_URI="https://dev.gentoo.org/~mattst88/distfiles/${P}.tar.xz
+	SRC_URI="https://dev.gentoo.org/~sam/distfiles/${CATEGORY}/${PN}/${P}.tar.xz
 		${COMMON_URI}"
 	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86"
 fi

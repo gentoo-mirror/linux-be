@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -23,7 +23,6 @@ fi
 
 PYTHON_COMPAT=( python3_{9..11} )
 WANT_LIBTOOL=none
-VERIFY_SIG_OPENPGP_KEY_PATH=/usr/share/openpgp-keys/dkiper.gpg
 
 if [[ -n ${GRUB_AUTOGEN} || -n ${GRUB_BOOTSTRAP} ]]; then
 	inherit python-any-r1
@@ -35,27 +34,17 @@ fi
 
 inherit bash-completion-r1 flag-o-matic multibuild optfeature toolchain-funcs
 
-MY_P=${P}
 if [[ ${PV} != 9999 ]]; then
-	inherit verify-sig
-
 	if [[ ${PV} == *_alpha* || ${PV} == *_beta* || ${PV} == *_rc* ]]; then
 		# The quote style is to work with <=bash-4.2 and >=bash-4.3 #503860
 		MY_P=${P/_/'~'}
-		SRC_URI="
-			https://alpha.gnu.org/gnu/${PN}/${MY_P}.tar.xz
-			verify-sig? ( https://alpha.gnu.org/gnu/${PN}/${MY_P}.tar.xz.sig )
-		"
+		SRC_URI="https://alpha.gnu.org/gnu/${PN}/${MY_P}.tar.xz"
 		S=${WORKDIR}/${MY_P}
 	else
-		SRC_URI="
-			mirror://gnu/${PN}/${P}.tar.xz
-			verify-sig? ( mirror://gnu/${PN}/${P}.tar.xz.sig )
-		"
+		SRC_URI="mirror://gnu/${PN}/${P}.tar.xz"
 		S=${WORKDIR}/${P%_*}
 	fi
-	BDEPEND="verify-sig? ( sec-keys/openpgp-keys-danielkiper )"
-	KEYWORDS="~amd64 ~arm ~arm64 ~ia64 ~loong ~ppc ~ppc64 ~riscv ~sparc ~x86"
+	KEYWORDS="~amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc ~x86"
 else
 	inherit git-r3
 	EGIT_REPO_URI="https://gitlab.com/linux-be/${PN}.git"
@@ -67,7 +56,7 @@ PATCHES=(
 )
 
 DEJAVU=dejavu-sans-ttf-2.37
-UNIFONT=unifont-15.0.06
+UNIFONT=unifont-12.1.02
 SRC_URI+=" fonts? ( mirror://gnu/unifont/${UNIFONT}/${UNIFONT}.pcf.gz )
 	themes? ( mirror://sourceforge/dejavu/${DEJAVU}.zip )"
 
@@ -90,7 +79,7 @@ REQUIRED_USE="
 	grub_platforms_loongson? ( fonts )
 "
 
-BDEPEND+="
+BDEPEND="
 	${PYTHON_DEPS}
 	>=sys-devel/flex-2.5.35
 	sys-devel/bison
@@ -102,7 +91,7 @@ BDEPEND+="
 	)
 	test? (
 		app-admin/genromfs
-		app-alternatives/cpio
+		app-arch/cpio
 		app-arch/lzop
 		app-emulation/qemu
 		dev-libs/libisoburn
@@ -121,11 +110,11 @@ DEPEND="
 	app-arch/xz-utils
 	>=sys-libs/ncurses-5.2-r5:0=
 	grub_platforms_emu? (
-		sdl? ( media-libs/libsdl2 )
+		sdl? ( media-libs/libsdl )
 	)
 	device-mapper? ( >=sys-fs/lvm2-2.02.45 )
 	libzfs? ( sys-fs/zfs:= )
-	mount? ( sys-fs/fuse:3 )
+	mount? ( sys-fs/fuse:0 )
 	truetype? ( media-libs/freetype:2= )
 	ppc? ( >=sys-apps/ibm-powerpc-utils-1.3.5 )
 	ppc64? ( >=sys-apps/ibm-powerpc-utils-1.3.5 )
@@ -140,7 +129,7 @@ RDEPEND="${DEPEND}
 	libzfs? ( sys-apps/beadm )
 "
 
-RESTRICT="!test? ( test ) test? ( userpriv )"
+RESTRICT="!test? ( test )"
 
 QA_EXECSTACK="usr/bin/grub-emu* usr/lib/grub/*"
 QA_PRESTRIPPED="usr/lib/grub/.*"
@@ -160,8 +149,6 @@ src_unpack() {
 		git-r3_fetch "${GNULIB_URI}" "${GNULIB_REVISION}"
 		git-r3_checkout "${GNULIB_URI}" gnulib
 		popd >/dev/null || die
-	elif use verify-sig; then
-		verify-sig_verify_detached "${DISTDIR}"/${MY_P}.tar.xz{,.sig}
 	fi
 	default
 }
@@ -229,8 +216,7 @@ grub_configure() {
 		$(use_enable themes grub-themes)
 		$(use_enable truetype grub-mkfont)
 		$(use_enable libzfs)
-		--enable-grub-emu-sdl=no
-		$(use_enable sdl grub-emu-sdl2)
+		$(use_enable sdl grub-emu-sdl)
 		${platform:+--with-platform=}${platform}
 
 		# Let configure detect this where supported
@@ -285,7 +271,7 @@ src_configure() {
 
 src_compile() {
 	# Sandbox bug 404013.
-	use libzfs && { addpredict /etc/dfs; addpredict /dev/zfs; }
+	use libzfs && addpredict /etc/dfs:/dev/zfs
 
 	grub_do emake
 	use doc && grub_do_once emake -C docs html
@@ -294,9 +280,7 @@ src_compile() {
 src_test() {
 	# The qemu dependency is a bit complex.
 	# You will need to adjust QEMU_SOFTMMU_TARGETS to match the cpu/platform.
-	local SANDBOX_WRITE=${SANDBOX_WRITE}
-	addwrite /dev
-	grub_do emake -j1 check
+	grub_do emake check
 }
 
 src_install() {
@@ -310,11 +294,6 @@ src_install() {
 
 	# https://bugs.gentoo.org/231935
 	dostrip -x /usr/lib/grub
-
-	if use elibc_musl; then
-		# https://bugs.gentoo.org/900348
-		QA_CONFIG_IMPL_DECL_SKIP=( re_set_syntax re_compile_pattern re_search )
-	fi
 }
 
 pkg_postinst() {
@@ -327,7 +306,6 @@ pkg_postinst() {
 			if ver_test -gt ${v}; then
 				ewarn
 				ewarn "Re-run grub-install to update installed boot code!"
-				ewarn "Re-run grub-mkconfig to update grub.cfg!"
 				ewarn
 				break
 			fi

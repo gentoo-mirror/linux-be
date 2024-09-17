@@ -1,16 +1,3 @@
-variables:
-  CONTAINER_TEST_IMAGE:  registry.gitlab.com/linux-be/overlay:$CI_COMMIT_SHA
-  CONTAINER_RELEASE_IMAGE: registry.gitlab.com/linux-be/overlay:latest
-
-build-image:
-  stage: build
-  tags:
-    - docker-build
-  script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
-    - docker build -t $CONTAINER_TEST_IMAGE .
-    - docker push $CONTAINER_TEST_IMAGE
-
 verify-repo:
   image:
     name: aegypius/repoman
@@ -26,27 +13,5 @@ verify-linux-be-changes:
   script:
     - ./sanity.sh
 
-check-fetch:
-  image: $CONTAINER_TEST_IMAGE
-  stage: test
-  script:
-    - for i in "$installed_overlay"/sys-fs/zfs/*.ebuild; do ebuild "$i" unpack; done
-    - for i in "$installed_overlay"/sys-fs/zfs-kmod/*.ebuild; do ebuild "$i" unpack; done
-
-release-image:
-  stage: release
-  tags:
-    - docker-build
-  script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
-    - docker pull $CONTAINER_TEST_IMAGE
-    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
-    - docker push $CONTAINER_RELEASE_IMAGE
-  only:
-    - master
-
 stages:
   - verify
-  - build
-  - test
-  - release
